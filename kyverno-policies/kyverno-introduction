@@ -1,0 +1,43 @@
+### Understanding the kyverno
+
+>> As a DevOps Engineer we are solely responsible for managing that kubernetes cluster, so managing according to 
+the compliance of organization(we can consider as rules).
+>> Every organization has some rules or every organization has some compliance and as a devops engineer we have to 
+make sure that compliance or that rules are met, this process is called as "governance".
+
+// What is that governance or what is that rule?
+
+>> Every pod that is created inside this kubernetes cluster should have proper resource requests and limits, so  
+this is the governance rule but the problem statement here is how do you define this governance rules, so one classic way of doing it is using the "admission controller".
+
+>> So what is admission controllers in kubernetes, so admission controller what does that mean whenever somebody is doing some admission activity whether you are trying to create a pod, whether you are trying to do a deployment, whether you are trying to create service everything goes through "kube API", So what kube API does is if you create a admission controller in kubernetes, basically a go language controller that you write by yourself and deploy in kubernetes every request that goes to the kube API will go to this admission controller that you have written and admission controller will basically validate, so this resource requests and limits are there in the pod or not.
+
+>> So the problem statement is that as a devops engineer one of your classic responsibility is to do governance of your kubernetes cluster what is governance, is nothing but maintaining or verifying or checking that your applications or your pods that are deployed or any resources that are deployed in kubernetes are following the standards of your organization, so this is governance.
+
+>> In any huge organization where they have hundreds of projects, thousands, millions you know there are like millions of users and you have like you know ten thousands of applications how do you write this governance rules or how do you even write these many number of admission controllers and how do you give this knowledge to all the devops engineers in your organization, So this is a very classic problem do you understand the magnitude of the problem, so now who is solving this problem, so to solve this problem there is a tool called "kyverno". 
+
+### kyverno 
+
+>> kyverno (Greek for "govern") is a cloud native policy engine.It was originally built for kubernetes and now can also be used outside of kubernetes clusters as a unified policy language.
+>> kyverno allows platform engineers to automate security, compliance, and best practices validation and deliver, secure self-service to application teams.
+
+### Some of its many features include:
+
+>> Policies as YAML-based declarative kubernetes resources with no new language to learn!
+>> Enforce policies as a kubernetes admission controller, cli-based scanner, and at runtime.
+>> Validate, mutate, generate, or cleanup(remove) any kubernetes resource.
+>> Verify container images and metadata for software supply chain security.
+>> Policies for any JSON payload including Terraform resources, cloud resources, and service authorization.
+>> Flexible policy exception management.
+>> Management of policies as code resources using familiar tools like git and kustomize.
+
+### How kyverno works
+// kubernetes admission controls:
+ 
+ >> kyverno runs as a dynamic admission controller in a kubernetes cluster. kyverno receives validating and mutating admission webhook HTTP callbacks from the kubernetes API server and applies matching policies to return
+ results that enforce admission policies or reject requests.
+
+ >> kyverno policies can match resources using the resource kind, name, label, selectors, and much more.
+ >> Mutating policies can be written as overlays (similar to kustomize) or as a RFC 6902 JSON patch. validating policies also use an overlay style syntax, with support for pattern matching and conditional (if-then-else) processing.
+ 
+ >> Policy enforcement is captured using kubernetes events.For requests that are either allowed or existed prior to introduction of a kyverno policy, kyverno creates policy reports in the cluster which contain a running list of resources matched by a policy, their status, and more. 
