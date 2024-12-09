@@ -1,0 +1,31 @@
+### Steps
+
+>> Open AWS console and launch an instance with our required type like medium or large --> then install minikube cluster and kubectl --> install kyverno using github documentation --> we can install Argo CD as well --> go to git hub and open Tasks-examples repository --> we can choose best-practices-cel --> then click on require-pod-requests-limits --> select require-pod-requests-limits.yaml --> then click on RAW [it can visible in the right hand side] --> copy URL link of the code [in search bar]. 
+                         ------------------------------------------
+### Install policy
+
+>> Go back to server and paste it here --> before the URL add kubectl apply -f [ URL link ]
+            # kubectl get pods
+            # kubectl get pods -A |grep kyverno
+            # kubectl logs kyverno-68c8744f8b-58xrz -n kyverno
+>> kyverno controller has read the yaml file, now once the kyverno policy is deployed on the cluster there is a kyverno kubernetes admission controller that is a dynamic kyverno admission controller which is reading your policy and according to the definition that you have created, so what you have created in your kyverno policy you said that every pod has to be created with requests and limits.
+>> Now you have also defined which namespace, so if we go to the example, this is a cluster level policy.
+            # kubectl create deployment nginx --image=nginx
+            # kubectl get pods |grep nginx
+>> suppose we are facing an issue on creating a pod, so we can follow this following command, 
+            # kubectl edit clusterpolicy require-requests-limits
+>> scroll down and hold on ValidationFailureAction:enforce instead of audit.
+                           --------------------------------
+>> This type of challenges common for devops engineers.
+            # kubectl logs kyverno-68c8744f86-58xrz -n kyverno 
+// It can showing "updating policy".
+            # kubectl create deployment nginx --image=nginx
+>> See what happened kyverno blocked our request, because kyverno is a dynamic admission controller, so it created a admission webhook and using this admission webhook request got denied.
+            # kubectl delete deploy nginx
+            # kubectl get clusterpolicy
+            # kubectl delete clusterpolicy require-requests-limits
+            # kubectl logs kyverno-68c8744f84b-58xrz -n kyverno
+>> Inside kyverno logs we can see that the policy got deleted. 
+>> Now let we can try to install nginx and this time it has to get installed successfully.
+            # kubectl create deployment nginx --image=nginx
+>> So this is the difference, so this is how you enforce the governance rules or this is how you do security, you configure the security for your organization using "kyverno".
