@@ -21,14 +21,18 @@ spec:
   background: true
   rules:
   - name: validate-resources
-    match:
+        match:
       any:
       - resources:
           kinds:
           - Pod
-          operations:
-          - CREATE
-          - UPDATE
+    preconditions:
+      all:
+      - key: "{{ request.operation }}"
+        operator: In
+        value:
+        - CREATE
+        - UPDATE
     validate:
       cel:
         expressions:
