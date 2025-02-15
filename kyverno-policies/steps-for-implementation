@@ -1,5 +1,8 @@
 ### Steps
 
+>> https://www.fosstechnix.com/install-argocd-on-minikube-with-ubuntu-24-04/
+>> https://docs.docker.com/engine/install/linux-postinstall/
+
 >> Open AWS console and launch an instance with our required type like medium or large --> then install minikube cluster and kubectl --> install kyverno using github documentation --> we can install Argo CD as well --> go to git hub and open Tasks-examples repository --> we can choose best-practices-cel --> then click on require-pod-requests-limits --> select require-pod-requests-limits.yaml --> then click on RAW [it can visible in the right hand side] --> copy URL link of the code [in search bar]. 
                          ------------------------------------------
 ### Install policy
