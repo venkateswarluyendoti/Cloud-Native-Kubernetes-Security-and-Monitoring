@@ -17,18 +17,22 @@ metadata:
       This policy validates that all containers have something specified for memory and CPU
       requests and memory limits.
 spec:
-  validationFailureAction: Audit
+  validationFailureAction: enforce
   background: true
   rules:
   - name: validate-resources
-    match:
+        match:
       any:
       - resources:
           kinds:
           - Pod
-          operations:
-          - CREATE
-          - UPDATE
+    preconditions:
+      all:
+      - key: "{{ request.operation }}"
+        operator: In
+        values:
+        - CREATE
+        - UPDATE
     validate:
       cel:
         expressions:
