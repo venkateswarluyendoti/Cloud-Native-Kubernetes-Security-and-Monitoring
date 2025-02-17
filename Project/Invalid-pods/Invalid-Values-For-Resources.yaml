@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: invalid-pod-invalid-values
+spec:
+  containers:
+    - name: nginx
+      image: nginx:latest
+      resources:
+        requests:
+          memory: "invalid-memory"  # Invalid value
+          cpu: "invalid-cpu"        # Invalid value
+        limits:
+          memory: "200Mi"
+          cpu: "200m"
