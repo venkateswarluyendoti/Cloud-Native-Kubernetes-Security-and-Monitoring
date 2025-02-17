@@ -1,10 +1,85 @@
 ### Steps
 
->> Open AWS console and launch an instance with our required type like medium or large --> then install minikube cluster and kubectl --> install kyverno using github documentation --> we can install Argo CD as well --> go to git hub and open Tasks-examples repository --> we can choose best-practices-cel --> then click on require-pod-requests-limits --> select require-pod-requests-limits.yaml --> then click on RAW [it can visible in the right hand side] --> copy URL link of the code [in search bar]. 
-                         ------------------------------------------
-### Install policy
+>> Open AWS console and launch an Ec2 instance with our required type like medium or large.
 
->> Go back to server and paste it here --> before the URL add kubectl apply -f [ URL link ]
+>> Open VS CODE then Open terminal, click on '+' symbol beside click on down arrow choose Git Bash(Default)--> Create a folder Enforce-kubernetes-security-with-kyverno --> then follow these steps
+$ ~/OneDrive/Desktop
+$ $ cd Enforce-Kubernetes-security-with-kyverno/
+$ git clone <github repository URL>
+
+--> connect server through like this 
+$ chmod 400 "abc.pem"
+$ ssh -i "abc.pem" ubuntu@ec2-3-84-245-107.compute-1.amazonaws.com
+
+--> we can see like this 
+ubuntu@ip-172-31-36-141:~$
+
+
+--> Then install minikube cluster and kubectl,
+>> https://www.fosstechnix.com/install-argocd-on-minikube-with-ubuntu-24-04/
+>> https://docs.docker.com/engine/install/linux-postinstall/
+>> mkdir -p /home/ubuntu/.docker
+sudo chown "$USER":"$USER" /home/ubuntu/.docker -R
+sudo chmod g+rwx "$HOME/.docker" -R
+>> sudo systemctl restart docker
+>> sudo usermod -aG docker $USER
+newgrp docker 
+
+--> install kyverno using github documentation --> we can install Argo CD as well --> go to git hub and open Enforce-kubernetes-security-with-kyverno repository --> Copy repository URL and 
+
+ubuntu@ip-172-31-36-141:~$ git clone <repository URL>
+
+>> Navigate to the repository via VS CODE --> we can choose Project then click on inside enforce-pod-requests-limits.yaml file --> Copy inside the code and paste it like this,
+### Install policy
+---------------------
+ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ vi enforce-pod-requests-limits.yaml
+ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ kubectl apply -f enforce-pod-requests-limits.yaml
+>> kyverno policy created successfully, then we can check it will work properly or not --> using valid yaml file and invalid yaml file 
+
+>> Invalid yaml file output:
+   ------------------------- ------------------------
+
+>> Example:1 
+ --------------
+
+ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+EOF       image: nginx:latestr
+Error from server: error when creating "STDIN": admission webhook "validate.kyverno.svc-fail" denied the request: 
+
+policy Deployment/default/test-deployment for resource violation:
+
+require-requests-limits:
+  autogen-validate-resources: 'validation error: CPU and memory resource requests
+    and limits are required. rule autogen-validate-resources failed at path /spec/template/spec/containers/0/resources/limits/' 
+>> Example:2
+
+ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ kubectl create deployment nginx --image=nginx
+error: failed to create deployment: admission webhook "validate.kyverno.svc-fail" denied the request: 
+
+policy Deployment/default/nginx for resource violation: 
+
+require-requests-limits:
+  autogen-validate-resources: 'validation error: CPU and memory resource requests
+    and limits are required. rule autogen-validate-resources failed at path /spec/template/spec/containers/0/resources/limits/'
+
+>> Valid yaml file output:
+   --------------------------------------------------
+>> Example:1
+-------------
+ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ kubectl apply -f correct.yaml 
+pod/valid-pod-with-resources created
+
+>> Example:2
+
+ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ vi Resource-Requests-Limits.yaml
+ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ kubectl apply -f Resource-Requests-Limits.yaml 
+pod/nginx created
+------------------------------------------
+>> Incase we can delete any pod usin this command, 
+            # kubectl delete pod <pod name>
             # kubectl get pods
             # kubectl get pods -A |grep kyverno
             # kubectl logs kyverno-68c8744f8b-58xrz -n kyverno
@@ -23,7 +98,7 @@
 >> See what happened kyverno blocked our request, because kyverno is a dynamic admission controller, so it created a admission webhook and using this admission webhook request got denied.
             # kubectl delete deploy nginx
             # kubectl get clusterpolicy
-            # kubectl delete clusterpolicy require-requests-limits
+            # kubectl delete clusterpolicy enforce-requests-limits
             # kubectl logs kyverno-68c8744f84b-58xrz -n kyverno
 >> Inside kyverno logs we can see that the policy got deleted. 
 >> Now let we can try to install nginx and this time it has to get installed successfully.
