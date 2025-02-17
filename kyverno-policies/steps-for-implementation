@@ -17,6 +17,9 @@ ubuntu@ip-172-31-36-141:~$
 
 --> Then install minikube cluster and kubectl,
 >> https://www.fosstechnix.com/install-argocd-on-minikube-with-ubuntu-24-04/
+                                (or)
+>> https://www.fosstechnix.com/how-to-install-argocd-on-minikube/
+
 >> https://docs.docker.com/engine/install/linux-postinstall/
 >> mkdir -p /home/ubuntu/.docker
 sudo chown "$USER":"$USER" /home/ubuntu/.docker -R
