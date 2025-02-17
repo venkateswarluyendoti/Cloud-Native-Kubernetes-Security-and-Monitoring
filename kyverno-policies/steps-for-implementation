@@ -40,6 +40,7 @@ ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ kubectl apply -f enforce-po
    ------------------------- ------------------------
 
 >> Example:1 
+ --------------
 
 ubuntu@ip-172-31-36-141:~/kyverno-security-policies$ kubectl apply -f - <<EOF
 apiVersion: apps/v1
