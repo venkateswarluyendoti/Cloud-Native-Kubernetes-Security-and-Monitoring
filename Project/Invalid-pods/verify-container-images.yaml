@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: untrusted-image-pod
+spec:
+  containers:
+    - name: custom-app
+      image: untrusted-registry.io/myapp:v1.0
