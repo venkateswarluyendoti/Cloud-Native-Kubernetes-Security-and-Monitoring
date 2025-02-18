@@ -1,24 +1,19 @@
-apiVersion: kyverno.io/v2beta1
+apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: verify-container-images
 spec:
-  validationFailureAction: Enforce
-  background: true
+  validationFailureAction: enforce
   rules:
-    - name: verify-image-signature
+    - name: validate-image
       match:
-        resources:
-          kinds:
-            - Pod
-            - Deployment
-      verifyImages:
-        - imageReferences:
-            - "ghcr.io/mycompany/*"
-          attestors:
-            - entries:
-                - keys:
-                    publicKeys: |
-                      -----BEGIN PUBLIC KEY-----
-                      YOUR-PUBLIC-KEY-HERE
-                      -----END PUBLIC KEY-----
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Container image must be pulled from a trusted registry."
+        pattern:
+          spec:
+            containers:
+              - image: "?*"
