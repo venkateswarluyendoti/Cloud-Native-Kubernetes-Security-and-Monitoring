@@ -1,18 +1,21 @@
-apiVersion: argoproj.io/v1alpha1
+apiVersion: argoprOAoj.io/v1alpha1
 kind: Application
 metadata:
-  name: kyverno-policies
-  namespace: argocd
+  name: my-app
+  namespace: argocd  # Ensure Argo CD is installed in this namespace
 spec:
   project: default
   source:
-    repoURL: "https://github.com/YOUR_USERNAME/kyverno-security-policies.git"
-    targetRevision: HEAD
-    path: "policies"
+    repoURL: https://github.com/venky2350/Enforce-kubernetes-security-with-kyverno.git
+    targetRevision: main  # Branch name
+    path: "Project"  # Directory inside the repo where manifests are stored
   destination:
     server: https://kubernetes.default.svc
-    namespace: kyverno
+    namespace: default
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: true  # Remove resources not in Git
+      selfHeal: true  # Sync changes automatically
+    syncOptions:
+      - CreateNamespace=true  # Automatically create namespace if not present
+    
