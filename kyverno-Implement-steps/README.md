@@ -1,8 +1,7 @@
-### Steps
+# Implementation Steps
+### * Open the AWS console and launch an EC2 instance of the required type, such as medium or large.
 
->> Open AWS console and launch an Ec2 instance with our required type like medium or large.
-
->> Open VS CODE then Open terminal, click on '+' symbol beside click on down arrow choose Git Bash(Default)--> Create a folder Enforce-kubernetes-security-with-kyverno --> then follow these steps
+##### >> Open VS CODE then Open terminal, click on '+' symbol beside click on down arrow choose Git Bash(Default)--> Create a folder Enforce-kubernetes-security-with-kyverno --> then follow these steps
 $ ~/OneDrive/Desktop
 $ $ cd Enforce-Kubernetes-security-with-kyverno/
 $ git clone <github repository URL>
