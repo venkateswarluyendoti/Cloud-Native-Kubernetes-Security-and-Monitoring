@@ -1,6 +1,10 @@
 # Enforcing Kubernetes Security with Kyverno using Argo CD GitOps
 **Overview**
-- This project demonstrates Kubernetes security governance using Kyverno for policy enforcement, managed via Argo CD for GitOps. It includes multi-environment support (dev, prod, staging), Prometheus/Grafana monitoring, policy testing, and comprehensive troubleshooting. The setup runs on a single-node Minikube cluster within AWS EC2 resource constraints (2 vCPUs, ~3.8GB memory). The goal is to create a professional, resume-ready GitHub repository.
+- This project demonstrates Kubernetes security governance using Kyverno for policy enforcement, managed via Argo CD for GitOps. It includes multi-environment support (dev, prod, staging), Prometheus/Grafana monitoring, policy testing, and comprehensive troubleshooting. The setup runs on a single-node Minikube cluster within AWS EC2 resource constraints (2 vCPUs, ~3.8GB memory).
+
+<img width="1918" height="422" alt="Screenshot 2025-10-18 121409" src="https://github.com/user-attachments/assets/b4a43bb4-e1ba-4751-9500-0681a02efc67" />
+<img width="1916" height="705" alt="Screenshot 2025-10-18 121336" src="https://github.com/user-attachments/assets/7507210c-a947-4bef-acdc-beff29a1303a" />
+
 
 **Goals**:
 
@@ -73,6 +77,9 @@ mkdir policies tests monitoring
 chmod +x setup.sh
 ./setup.sh
 ```
+<img width="1920" height="1080" alt="Screenshot (290)" src="https://github.com/user-attachments/assets/af38fe91-da96-4928-8995-ee2618a4f5cb" />
+<img width="1920" height="1080" alt="Screenshot (291)" src="https://github.com/user-attachments/assets/558ea27e-d9e8-4518-b676-10b82f9c2462" />
+
 **Verify**:
 
 - git --version (e.g., Git 2.x).
@@ -112,6 +119,8 @@ chmod +x install-kyverno.sh
 - kubectl get namespace kyverno (Active).
 - kubectl get pods -n kyverno (Running).
 - kubectl logs -n kyverno deployment/kyverno-admission-controller (no errors).
+
+<img width="1919" height="458" alt="Screenshot 2025-10-18 113855" src="https://github.com/user-attachments/assets/ae357735-f538-4700-b9f1-69f3685052b3" />
 
 ## Phase 3: Install Prometheus and Grafana
 
@@ -191,6 +200,16 @@ helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
 - Port-forward: kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
 - Access Grafana: http://localhost:31509 (admin password: kubectl get secret -n monitoring prometheus-grafana -o - jsonpath="{.data.admin-password}" | base64 -d).
 
+<img width="1920" height="1080" alt="Screenshot (305)" src="https://github.com/user-attachments/assets/83d2219f-ff30-4e09-bd57-d15506665660" />
+
+<img width="1920" height="1080" alt="Screenshot (308)" src="https://github.com/user-attachments/assets/e9762865-1b9a-4c8e-8754-d3de6bfeacfa" />
+<img width="1920" height="1080" alt="Screenshot (308)" src="https://github.com/user-attachments/assets/03240bdb-6dd9-490f-afb1-a025bd310b1e" />
+<img width="1920" height="1080" alt="Screenshot (309)" src="https://github.com/user-attachments/assets/29269ed4-3458-458c-9868-fedec367d9a1" />
+<img width="1920" height="1080" alt="Screenshot (310)" src="https://github.com/user-attachments/assets/4258f3fb-2a03-46a4-af4c-6b086dd69c69" />
+<img width="1920" height="1080" alt="Screenshot (312)" src="https://github.com/user-attachments/assets/8c15ce39-622d-4894-a7fa-3e1f97ca496c" />
+
+<img width="1920" height="1080" alt="Screenshot (313)" src="https://github.com/user-attachments/assets/24054d83-a48f-4a2c-a8e4-7b29890ad8ac" />
+
 ## Phase 4: Install and Configure Argo CD
 
 - Deploy Argo CD to manage policies via GitOps.
@@ -227,6 +246,8 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 sudo curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
 sudo chmod +x /usr/local/bin/argocd
 ```
+<img width="1920" height="1080" alt="Screenshot (293)" src="https://github.com/user-attachments/assets/31b1d088-5495-475b-9d0a-7a3d8f024ff0" />
+
 
 ## Phase 5: Apply Kyverno Policies
 
@@ -456,6 +477,9 @@ spec:
   - name: nginx
     image: nginx:latest
 ```
+<img width="1920" height="1080" alt="Screenshot (295)" src="https://github.com/user-attachments/assets/7c3aca32-d188-462f-abdb-22ed088ee8a6" />
+
+
 - #### vim tests/compliant-pod.yaml
 ```bash
 apiVersion: v1
@@ -474,12 +498,20 @@ spec:
         memory: "128Mi"
         cpu: "500m"
 ```
+<img width="1920" height="1080" alt="Screenshot (300)" src="https://github.com/user-attachments/assets/28def25e-1966-4c15-8333-69b0f784a72d" />
+<img width="1549" height="605" alt="Screenshot 2025-10-18 115251" src="https://github.com/user-attachments/assets/40e6eacf-41a1-4251-a4e5-59970a3806b0" />
 
 2. Test Deployment
 ```bash
 kubectl apply -f tests/non-compliant-pod.yaml
 kubectl apply -f tests/compliant-pod.yaml -n prod
 ```
+<img width="1920" height="1080" alt="Screenshot (299)" src="https://github.com/user-attachments/assets/0a081531-205d-456f-8f8d-1147e103a1f6" />
+<img width="1561" height="251" alt="Screenshot 2025-10-18 115156" src="https://github.com/user-attachments/assets/19074a36-598c-4206-833f-162885f6ce75" />
+
+<img width="1551" height="232" alt="Screenshot 2025-10-18 120728" src="https://github.com/user-attachments/assets/ae210df6-6d34-4292-bcf9-1359f689cff6" />
+<img width="1920" height="1080" alt="Screenshot (301)" src="https://github.com/user-attachments/assets/311c37f4-f58b-4b6f-ab40-2ea78b30c446" />
+<img width="1570" height="583" alt="Screenshot 2025-10-18 121002" src="https://github.com/user-attachments/assets/ee1111ea-089a-4411-b9cf-58e4c55a31c5" />
 
 - **Expected**:
 
