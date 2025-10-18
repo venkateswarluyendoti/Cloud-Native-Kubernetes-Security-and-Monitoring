@@ -64,7 +64,6 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 # Initialize repository
 git clone https://github.com/venkateswarluyendoti/Enforce-kubernetes-security-with-kyverno.git
 cd Enforce-kubernetes-security-with-kyverno
-mkdir policies tests monitoring
 ```
 
 - **Esc + Shift : wq**
