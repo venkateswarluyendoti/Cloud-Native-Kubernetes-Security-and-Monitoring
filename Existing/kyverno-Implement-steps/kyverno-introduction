@@ -1,43 +1,122 @@
-### Understanding the kyverno
+🧭 Understanding Kyverno
 
->> As a DevOps Engineer we are solely responsible for managing that kubernetes cluster, so managing according to 
-the compliance of organization(we can consider as rules).
->> Every organization has some rules or every organization has some compliance and as a devops engineer we have to 
-make sure that compliance or that rules are met, this process is called as "governance".
+As a DevOps Engineer, one of your key responsibilities is to manage the Kubernetes cluster according to your organization’s compliance policies and rules.
+This process of ensuring that every deployed resource adheres to these standards is called governance.
 
-// What is that governance or what is that rule?
+🔍 What is Governance?
 
->> Every pod that is created inside this kubernetes cluster should have proper resource requests and limits, so  
-this is the governance rule but the problem statement here is how do you define this governance rules, so one classic way of doing it is using the "admission controller".
+Every organization has certain rules or compliance policies that must be followed.
+For example:
 
->> So what is admission controllers in kubernetes, so admission controller what does that mean whenever somebody is doing some admission activity whether you are trying to create a pod, whether you are trying to do a deployment, whether you are trying to create service everything goes through "kube API", So what kube API does is if you create a admission controller in kubernetes, basically a go language controller that you write by yourself and deploy in kubernetes every request that goes to the kube API will go to this admission controller that you have written and admission controller will basically validate, so this resource requests and limits are there in the pod or not.
+Every Pod created inside the Kubernetes cluster should have proper resource requests and limits.
 
->> So the problem statement is that as a devops engineer one of your classic responsibility is to do governance of your kubernetes cluster what is governance, is nothing but maintaining or verifying or checking that your applications or your pods that are deployed or any resources that are deployed in kubernetes are following the standards of your organization, so this is governance.
+This rule ensures optimal resource utilization and prevents resource starvation.
+But how can these governance rules be defined, enforced, and validated automatically?
 
->> In any huge organization where they have hundreds of projects, thousands, millions you know there are like millions of users and you have like you know ten thousands of applications how do you write this governance rules or how do you even write these many number of admission controllers and how do you give this knowledge to all the devops engineers in your organization, So this is a very classic problem do you understand the magnitude of the problem, so now who is solving this problem, so to solve this problem there is a tool called "kyverno". 
+That’s where Admission Controllers come in.
 
-### kyverno 
+⚙️ Admission Controllers in Kubernetes
 
->> kyverno (Greek for "govern") is a cloud native policy engine.It was originally built for kubernetes and now can also be used outside of kubernetes clusters as a unified policy language.
->> kyverno allows platform engineers to automate security, compliance, and best practices validation and deliver, secure self-service to application teams.
+Whenever a user performs an action like creating a Pod, Deployment, or Service, the request goes through the Kubernetes API Server.
 
-### Some of its many features include:
+An Admission Controller is a component that intercepts these requests before they are persisted in etcd (the Kubernetes database).
+It can validate or mutate resources based on defined policies.
 
->> Policies as YAML-based declarative kubernetes resources with no new language to learn!
->> Enforce policies as a kubernetes admission controller, cli-based scanner, and at runtime.
->> Validate, mutate, generate, or cleanup(remove) any kubernetes resource.
->> Verify container images and metadata for software supply chain security.
->> Policies for any JSON payload including Terraform resources, cloud resources, and service authorization.
->> Flexible policy exception management.
->> Management of policies as code resources using familiar tools like git and kustomize.
+Example use case:
 
-### How kyverno works
-// kubernetes admission controls:
- 
- >> kyverno runs as a dynamic admission controller in a kubernetes cluster. kyverno receives validating and mutating admission webhook HTTP callbacks from the kubernetes API server and applies matching policies to return
- results that enforce admission policies or reject requests.
+When someone creates a Pod, the admission controller checks if it includes resource requests and limits.
 
- >> kyverno policies can match resources using the resource kind, name, label, selectors, and much more.
- >> Mutating policies can be written as overlays (similar to kustomize) or as a RFC 6902 JSON patch. validating policies also use an overlay style syntax, with support for pattern matching and conditional (if-then-else) processing.
- 
- >> Policy enforcement is captured using kubernetes events.For requests that are either allowed or existed prior to introduction of a kyverno policy, kyverno creates policy reports in the cluster which contain a running list of resources matched by a policy, their status, and more. 
+If not, the controller rejects or modifies the request before it gets created.
+
+However, in large organizations with hundreds or thousands of applications, maintaining and distributing these custom admission controllers becomes complex.
+
+To solve this problem, we use Kyverno.
+
+🚀 What is Kyverno?
+
+Kyverno (Greek for “govern”) is a cloud-native policy engine designed for Kubernetes.
+It automates security, compliance, and best practices validation, enabling secure self-service for application teams.
+
+Originally built for Kubernetes, Kyverno can now also be used outside of Kubernetes as a unified policy language.
+
+✨ Key Features of Kyverno
+
+📜 Policies as YAML-based declarative resources — no new language to learn.
+
+🔐 Enforce policies via:
+
+Kubernetes Admission Controller
+
+CLI-based scanner
+
+Runtime enforcement
+
+🔄 Validate, mutate, generate, or cleanup (remove) any Kubernetes resource.
+
+🧩 Verify container images and metadata to enhance supply chain security.
+
+🌍 Policy support for any JSON payload, including Terraform, cloud, or service authorization.
+
+⚙️ Flexible exception management for policies.
+
+🧠 Manage policies as code using familiar tools like Git and Kustomize.
+
+🧩 How Kyverno Works
+
+Kyverno runs as a Dynamic Admission Controller inside the Kubernetes cluster.
+
+The Kubernetes API Server sends validating and mutating admission webhook HTTP callbacks to Kyverno.
+
+Kyverno applies the matching policies.
+
+Based on the evaluation, it enforces, mutates, or rejects the incoming resource request.
+
+🔧 Policy Matching
+
+Kyverno policies can target resources based on:
+
+Resource kind, name, or namespace
+
+Labels or selectors
+
+Complex conditions or patterns
+
+🧱 Policy Types
+
+Mutating Policies
+
+Modify resources automatically (similar to Kustomize overlays)
+
+Can use RFC 6902 JSON patches
+
+Validating Policies
+
+Validate resources using overlay-style syntax
+
+Support pattern matching and conditional logic (if–then–else)
+
+🪶 Policy Reporting
+
+Enforcement results are logged as Kubernetes events.
+
+For resources allowed or existing before a policy was created, Kyverno generates Policy Reports.
+
+These reports provide a cluster-wide view of:
+
+Matched resources
+
+Policy compliance status
+
+Violations and recommendations
+
+📘 Summary
+
+Kyverno simplifies Kubernetes governance by allowing DevOps teams to:
+
+Define compliance policies declaratively in YAML
+
+Automatically validate and enforce them
+
+Maintain security and consistency across all workloads
+
+✅ In short, Kyverno brings policy-as-code, security, and automation together — empowering DevOps teams to maintain governance effortlessly.
