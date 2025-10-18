@@ -1,51 +1,50 @@
 # 🧭 Enforce Kubernetes Security with Kyverno
-
----
+                                   
 
 ## 📘 Overview
 
-As a **DevOps Engineer**, one of your key responsibilities is to **manage the Kubernetes cluster** according to your organization’s **compliance policies and rules**.  
-This process of ensuring that every deployed resource adheres to these standards is called **_governance_**.
+- As a **DevOps Engineer**, one of your key responsibilities is to **manage the Kubernetes cluster** according to your organization’s **compliance policies and rules**.  
+- This process of ensuring that every deployed resource adheres to these standards is called **"_governance_"**.
 
 ---
 
 ## 🔍 What is Governance?
 
-Every organization defines a set of **rules or compliance policies** that must be followed.  
+- Every organization defines a set of **rules or compliance policies** that must be followed.  
 
 **Example rule:**  
 > Every Pod created inside the Kubernetes cluster should have proper resource requests and limits.
 
-This ensures resource optimization and prevents over-consumption or starvation.  
-But how do you **define**, **enforce**, and **automate** such governance rules?  
-👉 That’s where **Admission Controllers** and **Kyverno** come into play.
+- This ensures resource optimization and prevents over-consumption or starvation.  
+- But how do you **define**, **enforce**, and **automate** such governance rules?  
+- 👉 That’s where **Admission Controllers** and **Kyverno** come into play.
 
 ---
 
 ## ⚙️ Admission Controllers in Kubernetes
 
-When a user performs actions like creating a Pod, Deployment, or Service, the request first goes through the **Kubernetes API Server**.  
+- When a user performs actions like creating a Pod, Deployment, or Service, the request first goes through the **Kubernetes API Server**.  
 
-An **Admission Controller** is a built-in mechanism that intercepts such requests **before they are saved** in Kubernetes.  
-It can:
+- An **Admission Controller** is a built-in mechanism that intercepts such requests **before they are saved** in Kubernetes.  
+- It can:
 - ✅ Validate resources  
 - 🧩 Mutate (modify) resources  
 - 🚫 Reject invalid requests  
 
 **Example:**  
-When a Pod is created, the admission controller can check whether resource requests and limits are defined. If not, it can reject the request.
+- When a Pod is created, the admission controller can check whether resource requests and limits are defined. If not, it can reject the request.
 
-However, maintaining multiple custom controllers for governance across hundreds of clusters is difficult.  
-To simplify this — we use **Kyverno**.
+- However, maintaining multiple custom controllers for governance across hundreds of clusters is difficult.  
+- To simplify this,  we use **Kyverno**.
 
 ---
 
 # 🚀 What is Kyverno?
 
-**Kyverno** (Greek for “govern”) is a **cloud-native policy engine** built specifically for Kubernetes.  
+- **Kyverno** (Greek for “govern”) is a **cloud-native policy engine** built specifically for Kubernetes.  
 It allows platform and DevOps engineers to automate **security**, **compliance**, and **best-practice validation** seamlessly.
 
-Originally designed for Kubernetes, Kyverno can now also operate **outside Kubernetes** as a **unified policy language**.
+- Originally designed for Kubernetes, Kyverno can now also operate **outside Kubernetes** as a **unified policy language**.
 
 ---
 
@@ -66,7 +65,7 @@ Originally designed for Kubernetes, Kyverno can now also operate **outside Kuber
 
 # 🧩 How Kyverno Works
 
-Kyverno operates as a **Dynamic Admission Controller** within a Kubernetes cluster.
+- Kyverno operates as a **Dynamic Admission Controller** within a Kubernetes cluster.
 
 1. The **Kubernetes API Server** sends admission requests (validating/mutating webhooks) to Kyverno.  
 2. Kyverno compares these requests against the **defined policies**.  
@@ -118,156 +117,136 @@ flowchart LR
     B -->|Persist Valid Resources| E[etcd / Cluster]
     C --> F[Policy Reports & Events]
 ```
-⚙️ Implementation Steps
+## ⚙️ Implementation Steps
 
-This section demonstrates how to enforce Kubernetes security using Kyverno on an AWS EC2 instance with Minikube.
+- This section demonstrates how to enforce Kubernetes security using Kyverno on an AWS EC2 instance with Minikube.
 
-🚀 1. Launch an EC2 Instance
+### 🚀 1. Launch an EC2 Instance
 
-Open the AWS Console.
+- Open the AWS Console.
 
-Launch an EC2 instance (recommended type: t2.medium or t2.large).
+- Launch an EC2 instance (recommended type: t2.medium or t2.large).
 
-💻 2. Setup Local Environment
-Open VS Code and Terminal
+### 💻 2. Setup Local Environment
 
-Open VS Code.
+- Open VS Code and Terminal
+- Open VS Code.
+- Click on the '+' icon beside the terminal tab → choose Git Bash (Default).
 
-Click on the '+' icon beside the terminal tab → choose Git Bash (Default).
+- Create Project Folder and Clone Repository
+  - $ cd ~/OneDrive/Desktop
+  - $ mkdir Enforce-Kubernetes-Security-with-Kyverno
+  - $ cd Enforce-Kubernetes-Security-with-Kyverno/
+  - $ git clone <github-repository-URL>
 
-Create Project Folder and Clone Repository
-$ cd ~/OneDrive/Desktop
-$ mkdir Enforce-Kubernetes-Security-with-Kyverno
-$ cd Enforce-Kubernetes-Security-with-Kyverno/
-$ git clone <github-repository-URL>
-
-🔗 3. Connect to EC2 Server
-$ chmod 400 "abc.pem"
-$ ssh -i "abc.pem" ubuntu@ec2-3-84-245-107.compute-1.amazonaws.com
-
+### 🔗 3. Connect to EC2 Server
+  - $ chmod 400 "abc.pem"
+  - $ ssh -i "abc.pem" ubuntu@ec2-3-84-245-107.compute-1.amazonaws.com
 
 You’ll see a prompt like:
+  - ubuntu@ip-172-31-36-141:~$
 
-ubuntu@ip-172-31-36-141:~$
+### ☸️ 4. Install Minikube and kubectl
 
-☸️ 4. Install Minikube and kubectl
+- Follow one of the official guides below:
 
-Follow one of the official guides below:
+ - Install ArgoCD on Minikube (Ubuntu 24.04) – [Fosstechnix](https://www.fosstechnix.com/install-argocd-on-minikube-with-ubuntu-24-04/)
+ 
+- **Alternative Guide**
 
-Install ArgoCD on Minikube (Ubuntu 24.04) – Fosstechnix
+### 🐳 5. Install and Configure Docker
 
-Alternative Guide
+- Follow Docker’s post-installation steps:
 
-🐳 5. Install and Configure Docker
+- **Docker Post-Install Docs**
+```bash
+  mkdir -p /home/ubuntu/.docker
+  sudo chown "$USER":"$USER" /home/ubuntu/.docker -R
+  sudo chmod g+rwx "$HOME/.docker" -R
+  sudo systemctl restart docker
+  sudo usermod -aG docker $USER
+  newgrp docker
+```
+### 🔐 6. Install Kyverno
 
-Follow Docker’s post-installation steps:
+- Follow Kyverno’s official installation guide.
 
-Docker Post-Install Docs
+- You can also install Argo CD if required.
 
-$ mkdir -p /home/ubuntu/.docker
-$ sudo chown "$USER":"$USER" /home/ubuntu/.docker -R
-$ sudo chmod g+rwx "$HOME/.docker" -R
-$ sudo systemctl restart docker
-$ sudo usermod -aG docker $USER
-$ newgrp docker
+**ubuntu@ip-172-31-36-141**:~$ git clone <repository-URL>
 
-🔐 6. Install Kyverno
+## 🧭 7. Apply Kyverno Policy
 
-Follow Kyverno’s official installation guide.
-
-You can also install Argo CD if required.
-
-ubuntu@ip-172-31-36-141:~$ git clone <repository-URL>
-
-🧭 7. Apply Kyverno Policy
-
-Navigate to the project in VS Code → open:
-
-enforce-pod-requests-limits.yaml
-
-Install the Policy
+- Navigate to the project in VS Code → open:
+- enforce-pod-requests-limits.yaml
+- Install the Policy
+```bash
 vi enforce-pod-requests-limits.yaml
 kubectl apply -f enforce-pod-requests-limits.yaml
+```
+- ### ✅ Kyverno policy created successfully.
+- pod/nginx created
 
+### 🧹 8. Managing Pods and Policies
+- **Delete a pod**
+  - kubectl delete pod <pod-name>
 
-✅ Kyverno policy created successfully.
+- **Check pods**
+  - kubectl get pods
 
-pod/nginx created
+- **Check Kyverno pods**
+  - kubectl get pods -A | grep kyverno
 
-🧹 8. Managing Pods and Policies
-# Delete a pod
-kubectl delete pod <pod-name>
+ - **View Kyverno logs**
+  - kubectl logs kyverno-68c8744f8b-58xrz -n kyverno
 
-# Check pods
-kubectl get pods
+### 🔄 9. Editing and Updating Kyverno Policy
 
-# Check Kyverno pods
-kubectl get pods -A | grep kyverno
+- If a pod creation fails due to enforcement, modify the policy:
+- kubectl edit clusterpolicy require-requests-limits
+  Change:
+  ValidationFailureAction: audit
+  to:
+  ValidationFailureAction: enforce
 
-# View Kyverno logs
-kubectl logs kyverno-68c8744f8b-58xrz -n kyverno
-
-🔄 9. Editing and Updating Kyverno Policy
-
-If a pod creation fails due to enforcement, modify the policy:
-
-kubectl edit clusterpolicy require-requests-limits
-
-
-Change:
-
-ValidationFailureAction: audit
-
-
-to:
-
-ValidationFailureAction: enforce
-
-🧠 10. Observing Kyverno Behavior
-kubectl logs kyverno-68c8744f86-58xrz -n kyverno
-
-
-Output:
-
+### 🧠 10. Observing Kyverno Behaviour
+- kubectl logs kyverno-68c8744f86-58xrz -n kyverno
+- Output:
 "updating policy"
 
-
-Then test again:
-
+**Then test again**:
+```bash
 kubectl create deployment nginx --image=nginx
+```
+- * Kyverno will block this request because it enforces resource validation through its admission webhook.
 
-
-Kyverno will block this request because it enforces resource validation through its admission webhook.
-
-🧹 11. Cleaning Up
+### 🧹 11. Cleaning Up
+```bash
 kubectl delete deploy nginx
 kubectl get clusterpolicy
 kubectl delete clusterpolicy enforce-requests-limits
 kubectl logs kyverno-68c8744f84b-58xrz -n kyverno
+```
+- Inside logs, you’ll see that the policy was deleted.
 
-
-Inside logs, you’ll see that the policy was deleted.
-
-Re-test deployment:
-
+- * Re-test deployment:
+```bash
 kubectl create deployment nginx --image=nginx
+```
+### ✅ This time, it deploys successfully because the Kyverno policy was removed.
 
+### 🧩 Summary
 
-✅ This time, it deploys successfully because the Kyverno policy was removed.
+ * Kyverno allows DevOps engineers to enforce governance and compliance in Kubernetes using declarative YAML policies.
+ * It ensures every workload adheres to security and organisational standards automatically.
 
-🧩 Summary
+### 🔒 Kyverno = Kubernetes Governance + Policy-as-Code + Security Automation
 
-Kyverno allows DevOps engineers to enforce governance and compliance in Kubernetes using declarative YAML policies.
-It ensures every workload adheres to security and organisational standards automatically.
+#### 📚 References
 
-🔒 Kyverno = Kubernetes Governance + Policy-as-Code + Security Automation
+- 🌐 [Kyverno Official Website](https://kyverno.io/)
+- 📘 [Kyverno Policy Library](https://kyverno.io/policies/)
+- 🧰 [Kyverno GitHub Repository](https://github.com/kyverno/kyverno)
 
-📚 References
-
-🌐 Kyverno Official Website
-
-📘 Kyverno Policy Library
-
-🧰 Kyverno GitHub Repository
 
 
