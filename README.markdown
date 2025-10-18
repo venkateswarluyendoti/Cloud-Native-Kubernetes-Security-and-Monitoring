@@ -216,7 +216,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 ```
 **Verify**: Access http://<EC2-IP>:<NodePort> (e.g., 32679).
-
+**Port-Forward** : kubectl port-forward --address 0.0.0.0 service/argocd-server 31545:80 -n argocd
 4. Get Admin Password
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
