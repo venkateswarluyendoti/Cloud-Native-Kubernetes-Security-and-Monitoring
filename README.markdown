@@ -263,6 +263,90 @@ spec:
             - monitoring
             - argocd
 ```
+- #### vim multi-environment.yaml
+```bash
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-requests-limits
+  annotations:
+    policies.kyverno.io/title: Require Requests and Limits
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Containers without resource requests and limits can burst and starve other pods.
+spec:
+  validationFailureAction: Enforce  # Blocks non-compliant resources
+  background: true
+  rules:
+
+  # Rule 1: General rule for all namespaces (base rule)
+  - name: check-for-requests-and-limits
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "Policy Violation: container resources requests and limits are required!"
+      pattern:
+        spec:
+          containers:
+          - resources:
+              requests:
+                memory: "?*"
+                cpu: "?*"
+              limits:
+                memory: "?*"
+                cpu: "?*"
+
+  # Rule 2: Stricter requirements for prod namespace
+  - name: check-for-prod-stricter-limits
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+          namespaces:
+          - prod
+    validate:
+      message: "Production requires stricter limits."
+      pattern:
+        spec:
+          containers:
+          - resources:
+              requests:
+                memory: ">=64Mi"
+                cpu: ">=250m"
+              limits:
+                memory: ">=128Mi"
+                cpu: ">=500m"
+
+  # Rule 3: Basic limits for dev and staging namespaces
+  - name: dev-staging-limits
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+          namespaces:
+          - dev
+          - staging
+    validate:
+      message: "Dev/Staging require basic limits."
+      pattern:
+        spec:
+          containers:
+          - resources:
+              requests:
+                memory: "?*"
+                cpu: "?*"
+              limits:
+                memory: "?*"
+                cpu: "?*"
+```
+
 
 - #### vim policies/require-requests-limits.yaml
 
