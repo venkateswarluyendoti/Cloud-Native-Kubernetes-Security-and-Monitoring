@@ -418,42 +418,26 @@ kubectl logs -n kyverno deployment/kyverno-admission-controller | grep "Policy V
 **Note**: If monitoring/argocd pods are blocked, verify exclude rules in policies.
 
 2. Create Troubleshooting Guide
-
-- #### vim troubleshooting.md
-
+- ### Troubleshooting and Solutions
+- ### vim troubleshooting.md
+- ### Common Issues and Fixes
 ```bash
-Troubleshooting Guide
-
-Issue: Kyverno blocks Prometheus/Grafana or Argo CD pods.Solution: Added exclude: namespaces: - monitoring - argocd to policies.  
-Issue: Minikube resource errors.Solution: Used 2 CPUs, 3GB memory (--memory=3072m). Reduce to 2GB if needed.  
-Issue: SyncError: failed calling webhook "mutate-policy.kyverno.svc": connection refused.Solution:  
-Check pods/services: kubectl get pods,svc -n kyverno.  
-Restart: kubectl rollout restart deployment -n kyverno.  
-Test connectivity: kubectl exec -n argocd <pod> -- curl -vk https://kyverno-svc.kyverno.svc:443.  
-Reapply: kubectl apply -f https://raw.githubusercontent.com/kyverno/kyverno/main/config/release/install.yaml.
-
-
-Issue: CrashLoopBackOff in kyverno-cleanup-controller or kyverno-reports-controller.Solution:  
-Check logs: kubectl logs -n kyverno <pod>.  
-Verify leases: kubectl get lease -n kyverno.  
-Test API server: curl -k https://kubernetes.default.svc:443/healthz.  
-Scale Minikube: minikube stop; minikube delete; minikube start --cpus=4 --memory=8192.
-
-
-Issue: Pod Pending: Insufficient CPU.Solution:  
-Check usage: kubectl top nodes, kubectl top pods -A.  
-Delete low-priority pods: kubectl delete pod compliant-pod -n dev.  
-Scale Minikube: minikube stop; minikube delete; minikube start --cpus=4 --memory=8192.
-
-
-Issue: Invalid value: 0: must be specified for update.Solution:  
-Delete/reapply: kubectl delete clusterpolicy <name> && kubectl apply -f <policy.yaml>.  
-Force apply: kubectl apply -f <policy.yaml> --force.
-
-
-
-One-Liner Debug:kubectl get pods,svc,endpoints,mutatingwebhookconfigurations,validatingwebhookconfigurations -n kyverno
-
+Issue,Cause,Solution
+"SyncError: failed calling webhook ""mutate-policy.kyverno.svc"": connection refused","Kyverno webhook unreachable (pod crash, service/DNS issue).","1. Check pods/services: kubectl get pods,svc -n kyverno. 
+ 2. Restart: kubectl rollout restart deployment -n kyverno. 
+ 3. Test: kubectl exec -n argocd <pod> -- curl -vk https://kyverno-svc.kyverno.svc:443. 
+ 4. Reapply Kyverno: kubectl apply -f https://raw.githubusercontent.com/kyverno/kyverno/main/config/release/install.yaml."
+CrashLoopBackOff in kyverno-cleanup-controller or kyverno-reports-controller,Leader election failure (context deadline).,"1. Check logs: kubectl logs -n kyverno <pod>. 
+ 2. Verify leases: kubectl get lease -n kyverno. 
+ 3. Test API server: curl -k https://kubernetes.default.svc:443/healthz. 
+ 4. Scale Minikube: minikube stop; minikube delete; minikube start --cpus=4 --memory=8192."
+Pod Pending: Insufficient CPU,Node resource exhaustion (100% CPU allocated).,"1. Check usage: kubectl top nodes, kubectl top pods -A. 
+ 2. Delete low-priority pods: kubectl delete pod compliant-pod -n dev. 
+ 3. Scale Minikube: minikube stop; minikube delete; minikube start --cpus=4 --memory=8192."
+Invalid value: 0: must be specified for update,Missing resource version for policy update.,"1. Delete/reapply: kubectl delete clusterpolicy <name> && kubectl apply -f <policy.yaml>. 
+ 2. Force apply: kubectl apply -f <policy.yaml> --force."
+Kyverno blocks monitoring/argocd pods,Missing namespace exclusions.,Add exclude: namespaces: - monitoring - argocd to policies.
+Minikube resource errors,EC2 resource limits exceeded.,Reduce to --memory=2048m or scale to --cpus=4 --memory=8192.
 ```
 
 ## Phase 8: Extend with Multi-Environment Support
