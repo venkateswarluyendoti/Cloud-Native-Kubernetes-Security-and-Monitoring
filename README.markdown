@@ -146,7 +146,13 @@ chmod +x install-kyverno.sh
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 ```
+
+<img width="1912" height="426" alt="image" src="https://github.com/user-attachments/assets/26ee41f6-cd34-4bdc-93e4-323afc418aef" />
+
 - **Verify**: helm search repo prometheus-community (lists charts).
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/532c97d7-bc77-444b-9cfb-99228ddbc303" />
+
 
 2. Create Prometheus Values File
 
