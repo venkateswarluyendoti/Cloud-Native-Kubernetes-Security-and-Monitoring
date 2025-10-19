@@ -1,4 +1,4 @@
-# Enforcing Kubernetes Security with Kyverno using Argo CD GitOps
+# Cloud-Native Kubernetes Security and Monitoring with Kyverno and GitOps
 **Overview**
 - This project demonstrates Kubernetes security governance using Kyverno for policy enforcement, managed via Argo CD for GitOps. It includes multi-environment support (dev, prod, staging), Prometheus/Grafana monitoring, policy testing, and comprehensive troubleshooting. The setup runs on a single-node Minikube cluster within AWS EC2 resource constraints (2 vCPUs, ~3.8GB memory).
 
