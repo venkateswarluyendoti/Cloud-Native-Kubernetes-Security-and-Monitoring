@@ -202,7 +202,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
 <img width="1920" height="1080" alt="Screenshot (305)" src="https://github.com/user-attachments/assets/83d2219f-ff30-4e09-bd57-d15506665660" />
 
 <img width="1920" height="1080" alt="Screenshot (308)" src="https://github.com/user-attachments/assets/e9762865-1b9a-4c8e-8754-d3de6bfeacfa" />
-<img width="1920" height="1080" alt="Screenshot (308)" src="https://github.com/user-attachments/assets/03240bdb-6dd9-490f-afb1-a025bd310b1e" />
+
 <img width="1920" height="1080" alt="Screenshot (309)" src="https://github.com/user-attachments/assets/29269ed4-3458-458c-9868-fedec367d9a1" />
 <img width="1920" height="1080" alt="Screenshot (310)" src="https://github.com/user-attachments/assets/4258f3fb-2a03-46a4-af4c-6b086dd69c69" />
 <img width="1920" height="1080" alt="Screenshot (312)" src="https://github.com/user-attachments/assets/8c15ce39-622d-4894-a7fa-3e1f97ca496c" />
