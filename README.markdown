@@ -63,7 +63,7 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 # Initialize repository
 git clone https://github.com/venkateswarluyendoti/Cloud-Native-Kubernetes-Security-and-Monitoring.git
-cd Enforce-kubernetes-security-with-kyverno
+cd Cloud-Native-Kubernetes-Security-and-Monitoring
 ```
 
 - **Esc + Shift : wq**
