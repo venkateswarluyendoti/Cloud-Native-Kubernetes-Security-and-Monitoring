@@ -199,9 +199,6 @@ helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
 - Port-forward: kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
 - Access Grafana: http://localhost:31509 (admin password: kubectl get secret -n monitoring prometheus-grafana -o - jsonpath="{.data.admin-password}" | base64 -d).
 
-<img width="1920" height="1080" alt="Screenshot (305)" src="https://github.com/user-attachments/assets/83d2219f-ff30-4e09-bd57-d15506665660" />
-
-<img width="1920" height="1080" alt="Screenshot (308)" src="https://github.com/user-attachments/assets/e9762865-1b9a-4c8e-8754-d3de6bfeacfa" />
 
 <img width="1920" height="1080" alt="Screenshot (309)" src="https://github.com/user-attachments/assets/29269ed4-3458-458c-9868-fedec367d9a1" />
 <img width="1920" height="1080" alt="Screenshot (310)" src="https://github.com/user-attachments/assets/4258f3fb-2a03-46a4-af4c-6b086dd69c69" />
@@ -233,8 +230,10 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 ```bash
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 ```
-**Verify**: Access http://<EC2-IP>:<NodePort> (e.g., 32679).
-**Port-Forward** : kubectl port-forward --address 0.0.0.0 service/argocd-server 31545:80 -n argocd
+- **Verify**: Access http://<EC2-IP>:<NodePort> (e.g., 32679).
+
+- **Port-Forward** : kubectl port-forward --address 0.0.0.0 service/argocd-server 31545:80 -n argocd
+
 4. Get Admin Password
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
@@ -523,8 +522,6 @@ kubectl apply -f tests/compliant-pod.yaml -n prod
 
 ## Phase 7: Troubleshoot and Document
 
-- Address common issues and document solutions for professionalism.
-
 1. Check Logs
 
 ```bash
@@ -610,7 +607,13 @@ kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n mo
 - Log in (admin password: kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 -d).
 - Add Prometheus data source: 
     - **ex**: http://10.108.46.119:9090
+
+<img width="1920" height="1080" alt="Screenshot (305)" src="https://github.com/user-attachments/assets/83d2219f-ff30-4e09-bd57-d15506665660" />
+
+<img width="1920" height="1080" alt="Screenshot (308)" src="https://github.com/user-attachments/assets/e9762865-1b9a-4c8e-8754-d3de6bfeacfa" />
+
 - Create dashboard with query: rate(kyverno_policy_violations_total[5m]).
+  
 - **Note**: If metrics fail, verify Kyverno’s metrics port (default 8000).
 
 
