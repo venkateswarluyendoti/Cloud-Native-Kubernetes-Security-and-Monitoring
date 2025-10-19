@@ -2,7 +2,13 @@
 **Overview**
 - This project demonstrates Kubernetes security governance using Kyverno for policy enforcement, managed via Argo CD for GitOps. It includes multi-environment support (dev, prod, staging), Prometheus/Grafana monitoring, policy testing, and comprehensive troubleshooting. The setup runs on a single-node Minikube cluster within AWS EC2 resource constraints (2 vCPUs, ~3.8GB memory).
 
-<img width="1918" height="422" alt="Screenshot 2025-10-18 121409" src="https://github.com/user-attachments/assets/b4a43bb4-e1ba-4751-9500-0681a02efc67" />
+<img width="1917" height="723" alt="image" src="https://github.com/user-attachments/assets/14d4a722-5978-47d8-a785-6efea3d62a87" />
+
+<img width="1915" height="689" alt="Screenshot 2025-10-19 092455" src="https://github.com/user-attachments/assets/a1da5994-1936-4207-97dc-eaa6564c8ada" />
+<img width="1919" height="722" alt="Screenshot 2025-10-19 092527" src="https://github.com/user-attachments/assets/9cc018df-c1f9-4cd9-b781-395e72543eac" />
+
+<img width="1913" height="732" alt="image" src="https://github.com/user-attachments/assets/b2d5c15d-206b-478d-b896-83fae07d6709" />
+
 <img width="1916" height="705" alt="Screenshot 2025-10-18 121336" src="https://github.com/user-attachments/assets/7507210c-a947-4bef-acdc-beff29a1303a" />
 
 
@@ -16,25 +22,59 @@
 Repo Structure:
 ```bash
 Cloud-Native-Kubernetes-Security-and-Monitoring/
-├── policies/
+├── Docker Compose/
+│   ├── docker-compose.yaml
+│   └── prometheus.yaml
+├── Existing/
+│   ├── Project/
+│   │   ├── Block-latest-tag.sh
+│   │   ├── Block-latest-tag.yaml
+│   │   ├── Create an Argo CD Application for Kyverno Policies
+│   │   │   ├── argo-kyverno-app.yaml
+│   │   │   └── argo.sh
+│   │   ├── Generate → Auto-create a Default Network Policy.yaml
+│   │   ├── Invalid-pods/
+│   │   │   ├── Block-Latest-tag.yaml
+│   │   │   ├── First Policy-SecondPolicy.yaml
+│   │   │   ├── Invalid-Values-For-Resources.yaml
+│   │   │   ├── Missing-Only-Limits.yaml
+│   │   │   ├── Missing-Requests-Limits.yaml
+│   │   │   ├── Violating Policies.yaml
+│   │   │   └── verify-container-images.yaml
+│   │   ├── Mutate → Auto-Inject Pod Security Context.yaml
+│   │   ├── Validate → Block Usage of latest Tag in Deployments.yaml
+│   │   ├── Verify Images → Ensure Container Images are Signed.yaml
+│   │   ├── enforce-network-policy.yaml
+│   │   ├── enforce-pod-requests-limits.yml
+│   │   └── valid-pods/
+│   │       ├── Corrected-invalid-pod.yaml
+│   │       ├── secure-nginx-deployment.yaml
+│   │       ├── test-deployment-4-policies.yaml
+│   │       └── valid-pod-with-resources.yaml
+│   └── kyverno-Implement-steps
+│       └── README.markdown
+├── Policies/
 │   ├── disallow-latest-tag.yaml
+│   ├── multi-environment.yaml
 │   └── require-requests-limits.yaml
-├── tests/
-│   ├── compliant-pod.yaml
-│   └── non-compliant-pod.yaml
+├── README.markdown
+├── kyverno-Implement-steps
+│   └── README.md
 ├── monitoring/
 │   ├── kyverno-servicemonitor.yaml
 │   └── prometheus-values.yaml
-├── setup.sh
-├── install-kyverno.sh
-├── troubleshooting.md
-├── README.md
+└── tests/
+    ├── compliant-pod.yaml
+    └── non-compliant-pod.yaml
+
+12 directories, 33 files
+
 ```
 
 
 ## Phase 1: Prerequisites and Environment Setup
 
-- Set up the base environment with Docker, Minikube, kubectl, Helm, and Git, ensuring Docker permissions for non-root users.
+- **Set up the base environment with Docker, Minikube, kubectl, Helm, and Git, ensuring Docker permissions for "non-root users"**.
 
 - ### vim setup.sh
 ```bash
@@ -211,18 +251,107 @@ pushgateway:
 kubectl create namespace monitoring
 helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring -f prometheus-values.yaml
 ```
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e31b45c9-a9e5-4bcd-87e9-7616f295220f" />
+
+
+
 **Verify**:
 
 - kubectl get pods -n monitoring (Running).
-- Port-forward: kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
-- Access Grafana: http://localhost:31509 (admin password: kubectl get secret -n monitoring prometheus-grafana -o - jsonpath="{.data.admin-password}" | base64 -d).
 
+<img width="1914" height="353" alt="image" src="https://github.com/user-attachments/assets/0fed8da5-c981-4e07-87a8-3f9016ac2fae" />
+  
+- Change Service Type to NodePort
+
+```bash
+kubectl patch svc prometheus-grafana -n monitoring -p '{"spec": {"type": "NodePort"}}'
+```
+
+<img width="1545" height="291" alt="image" src="https://github.com/user-attachments/assets/97b3f587-395c-40ea-9860-66c36d7eafdd" />
+
+- Then verify:
+
+```bash
+kubectl get svc prometheus-grafana -n monitoring
+```
+- You should now see something like:
+
+```bash
+NAME                 TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+prometheus-grafana   NodePort   10.105.141.176  <none>        80:3xxxx/TCP     5m
+```
+
+- Port-forward: kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
+
+- ### 🌐 Access Grafana from Browser
+
+- Use your EC2 public IP or DNS:
+```bash
+http://<ec2-public-ip>:<nodeport>
+```
+
+- Example:
+```bash
+http://3.90.246.106:30977
+```
+
+- Access Grafana: http://localhost:31509 
+- Get Grafana Admin Username:
+
+```bash
+kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode; echo
+```
+
+- Get Grafana Admin Password:
+
+```bash
+kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
+```
+<img width="1919" height="277" alt="image" src="https://github.com/user-attachments/assets/f5ef13fe-fa22-432d-b193-38cbeb177a4a" />
+
+<img width="1919" height="897" alt="image" src="https://github.com/user-attachments/assets/67f75178-2be1-425d-b488-d4b64bccd4a1" />
+
+
+<img width="1919" height="793" alt="image" src="https://github.com/user-attachments/assets/0319ea46-d8d4-4a6f-b3b5-e5ce895c683a" />
+
+```bash
+kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
+```
+<img width="1544" height="81" alt="image" src="https://github.com/user-attachments/assets/10e9f66c-9737-4554-a0e6-ba5db2bfe6e0" />
+
+- **Optional**: Change Service Type to NodePort (for external access)
+  
+```bash
+kubectl patch svc prometheus-kube-prometheus-prometheus -n monitoring -p '{"spec": {"type": "NodePort"}}'
+kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
+```
+<img width="1548" height="163" alt="image" src="https://github.com/user-attachments/assets/81ac3bad-1ed1-4ee1-b40b-82881a5b308d" />
+
+
+
+- **Note**:
+- ### Dashboard of Grafana under "Connection"
+  - In the Prometheus server URL field, we must add http:// before the IP address..
+    - Ex: http://10.108.199.33:9090
+
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1a51474a-7d8c-4945-b407-096334851acd" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/fc2c8edc-3dab-4003-8679-822cdbc1f464" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/383ecf23-c244-4672-9b2b-2583b2fd523d" />
 
 <img width="1920" height="1080" alt="Screenshot (309)" src="https://github.com/user-attachments/assets/29269ed4-3458-458c-9868-fedec367d9a1" />
+
 <img width="1920" height="1080" alt="Screenshot (310)" src="https://github.com/user-attachments/assets/4258f3fb-2a03-46a4-af4c-6b086dd69c69" />
+
 <img width="1920" height="1080" alt="Screenshot (312)" src="https://github.com/user-attachments/assets/8c15ce39-622d-4894-a7fa-3e1f97ca496c" />
 
+<img width="1919" height="786" alt="image" src="https://github.com/user-attachments/assets/0c4d0773-e96f-405b-ae31-29e03e4283d1" />
+
 <img width="1920" height="1080" alt="Screenshot (313)" src="https://github.com/user-attachments/assets/24054d83-a48f-4a2c-a8e4-7b29890ad8ac" />
+
 
 ## Phase 4: Install and Configure Argo CD
 
@@ -230,34 +359,55 @@ helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
 
 #### Steps
 
-1. Create Namespace
+1. **Create Namespace**
 
 ```bash
 kubectl create namespace argocd
 ```
 
-2. Install Argo CD
+2. **Install Argo CD**
 ```bash
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/950c5ef8-3b9f-4556-84ce-d92b3824324d" />
+
+
 **Verify**: kubectl get pods -n argocd (Running).
 
-3. Expose API Server
+<img width="1916" height="348" alt="image" src="https://github.com/user-attachments/assets/af0aecb2-64d7-4cc9-b1ce-81b5b66819e4" />
+
+
+
+3. **Expose API Server**
 
 ```bash
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 ```
+
+<img width="1916" height="189" alt="image" src="https://github.com/user-attachments/assets/d69c1ff5-5057-49e0-8d61-80edf17dd87f" />
+
+
+
 - **Verify**: Access http://<EC2-IP>:<NodePort> (e.g., 32679).
 
 - **Port-Forward** : kubectl port-forward --address 0.0.0.0 service/argocd-server 31545:80 -n argocd
 
-4. Get Admin Password
+4. **Get Admin Password**
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
 
-5. Install Argo CD CLI
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ba544929-bc0f-47b9-b255-6b96693d8936" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/57562ccb-68af-45e0-ac4a-150c160cd431" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ab003f9d-c3f7-48a2-b770-34698ed0fd93" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e198a3d4-1f61-4abb-9df3-c294d7d4b121" />
+
+
+5. **Install Argo CD CLI**
 ```bash
 sudo curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
 sudo chmod +x /usr/local/bin/argocd
@@ -269,7 +419,7 @@ sudo chmod +x /usr/local/bin/argocd
 
 - Define and apply policies to enforce resource limits and disallow "latest" tags, with exclusions for monitoring and argocd.
 
-1. Create Policy Files
+1. **Create Policy Files**
 
 - #### vim policies/disallow-latest-tag.yaml
 
@@ -480,7 +630,7 @@ spec:
 
 - Validate policy enforcement with compliant and non-compliant pods.
 
-1. Create Test Files
+1. **Create Test Files**
 
 - #### vim tests/non-compliant-pod.yaml
 ```bash
@@ -493,6 +643,10 @@ spec:
   - name: nginx
     image: nginx:latest
 ```
+
+<img width="1557" height="314" alt="image" src="https://github.com/user-attachments/assets/198682d6-a6c2-4d1b-8833-822883f995ae" />
+
+
 <img width="1920" height="1080" alt="Screenshot (295)" src="https://github.com/user-attachments/assets/7c3aca32-d188-462f-abdb-22ed088ee8a6" />
 
 
@@ -514,10 +668,13 @@ spec:
         memory: "128Mi"
         cpu: "500m"
 ```
+<img width="1559" height="212" alt="image" src="https://github.com/user-attachments/assets/fcd24d53-0263-4927-be14-4ca4728c6c80" />
+
+
 <img width="1920" height="1080" alt="Screenshot (300)" src="https://github.com/user-attachments/assets/28def25e-1966-4c15-8333-69b0f784a72d" />
 <img width="1549" height="605" alt="Screenshot 2025-10-18 115251" src="https://github.com/user-attachments/assets/40e6eacf-41a1-4251-a4e5-59970a3806b0" />
 
-2. Test Deployment
+2. **Test Deployment**
 ```bash
 kubectl apply -f tests/non-compliant-pod.yaml
 kubectl apply -f tests/compliant-pod.yaml -n prod
@@ -538,61 +695,41 @@ kubectl apply -f tests/compliant-pod.yaml -n prod
     - kubectl describe pod non-compliant-pod (Kyverno denial in events).
 
 
-## Phase 7: Troubleshoot and Document
-
-1. Check Logs
-
-```bash
-kubectl logs -n kyverno deployment/kyverno-admission-controller | grep "Policy Violation"
-```
-**Note**: If monitoring/argocd pods are blocked, verify exclude rules in policies.
-
-2. Create Troubleshooting Guide
-- ### Troubleshooting and Solutions
-- ### Common Issues and Fixes
-
-| **Issue** | **Cause** | **Solution** |
-|------------|------------|--------------|
-| **SyncError: failed calling webhook "mutate-policy.kyverno.svc": connection refused** | Kyverno webhook unreachable (pod crash, service/DNS issue). | 1. Check pods/services: `kubectl get pods,svc -n kyverno`<br>2. Restart: `kubectl rollout restart deployment -n kyverno`<br>3. Test: `kubectl exec -n argocd <pod> -- curl -vk https://kyverno-svc.kyverno.svc:443`<br>4. Reapply Kyverno: `kubectl apply -f https://raw.githubusercontent.com/kyverno/kyverno/main/config/release/install.yaml` |
-| **CrashLoopBackOff in kyverno-cleanup-controller or kyverno-reports-controller** | Leader election failure (context deadline). | 1. Check logs: `kubectl logs -n kyverno <pod>`<br>2. Verify leases: `kubectl get lease -n kyverno`<br>3. Test API server: `curl -k https://kubernetes.default.svc:443/healthz`<br>4. Scale Minikube: `minikube stop; minikube delete; minikube start --cpus=4 --memory=8192` |
-| **Pod Pending: Insufficient CPU** | Node resource exhaustion (100% CPU allocated). | 1. Check usage: `kubectl top nodes`, `kubectl top pods -A`<br>2. Delete low-priority pods: `kubectl delete pod compliant-pod -n dev`<br>3. Scale Minikube: `minikube stop; minikube delete; minikube start --cpus=4 --memory=8192` |
-| **Invalid value: 0: must be specified for update** | Missing resource version for policy update. | 1. Delete/reapply: `kubectl delete clusterpolicy <name> && kubectl apply -f <policy.yaml>`<br>2. Force apply: `kubectl apply -f <policy.yaml> --force` |
-| **Kyverno blocks monitoring/argocd pods** | Missing namespace exclusions. | Add exclude section in policies:<br>```yaml<br>namespaces:<br>  - monitoring<br>  - argocd<br>``` |
-| **Minikube resource errors** | EC2 resource limits exceeded. | Reduce resources: `--memory=2048m` or scale to higher specs: `--cpus=4 --memory=8192` |
-
-
-
-## Phase 8: Extend with Multi-Environment Support
+## Phase 7: Extend with Multi-Environment Support
 
 - Add namespace-based policies for dev, prod, and staging.
 
-1. Create Namespaces
+1. **Create Namespaces**
 
 ```bash
 kubectl create namespace dev
 kubectl create namespace prod
 kubectl create namespace staging
 ```
-**Verify**: kubectl get namespaces (dev, prod, staging listed).
+- **Verify**: kubectl get namespaces (dev, prod, staging listed).
+<img width="1546" height="160" alt="image" src="https://github.com/user-attachments/assets/dcae253a-8bec-498f-a1d5-fa07d34b5fd1" />
 
-2. Update Policy for Multi-Environment
+<img width="1559" height="309" alt="image" src="https://github.com/user-attachments/assets/1fa35605-9264-4efa-962b-6d3e86801ae9" />
+
+
+2. **Update Policy for Multi-Environment**
 
 - The require-requests-limits.yaml (above) already includes rules for prod and dev/staging. Reapply if modified:
 
 ```bash
 kubectl apply -f policies/require-requests-limits.yaml
 ```
-3. Test in Prod
+3. **Test in Prod**
 ```bash
 kubectl apply -f tests/compliant-pod.yaml -n prod
 ```
-**Verify**: kubectl get pods -n prod (compliant-pod Running).
+- **Verify**: kubectl get pods -n prod (compliant-pod Running).
 
-## Phase 9: Integrate Monitoring with Kyverno
+## Phase 8: Integrate Monitoring with Kyverno
 
 - Visualize Kyverno metrics in Prometheus/Grafana.
 
-1. Create ServiceMonitor
+1. **Create ServiceMonitor**
 
 - #### vim monitoring/kyverno-servicemonitor.yaml
 ```bash
@@ -609,20 +746,23 @@ spec:
   - port: metrics
     path: /metrics
 ```
-2. Apply ServiceMonitor
+2. **Apply ServiceMonitor**
 ```bash
 kubectl apply -f monitoring/kyverno-servicemonitor.yaml
 ```
 
-**Verify**: kubectl get servicemonitor -n monitoring (kyverno-metrics listed).
+- **Verify**: **kubectl get servicemonitor -n monitoring** (kyverno-metrics listed).
 
-3. Configure Grafana Dashboard
+<img width="1557" height="424" alt="image" src="https://github.com/user-attachments/assets/008755c0-edf0-4543-bbc1-e64579c810ca" />
+
+
+3. **Configure Grafana Dashboard**
 ```bash
 kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
 ```
 
 - Access http://localhost:31509.
-- Log in (admin password: kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 -d).
+- Log in (admin password): kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
 - Add Prometheus data source: 
     - **ex**: http://10.108.46.119:9090
 
@@ -634,15 +774,70 @@ kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n mo
   
 - **Note**: If metrics fail, verify Kyverno’s metrics port (default 8000).
 
+## Phase 9: Troubleshoot and Document
+
+1. **Check Logs**
+
+```bash
+kubectl logs -n kyverno deployment/kyverno-admission-controller | grep "Policy Violation"
+```
+**Note**: If monitoring/argocd pods are blocked, verify the exclude rules in policies.
+
+2. Create Troubleshooting Guide
+- ### Troubleshooting and Solutions
+- ### Common Issues and Fixes
+
+| **Issue** | **Cause** | **Solution** |
+|------------|------------|--------------|
+| **SyncError: failed calling webhook "mutate-policy.kyverno.svc": connection refused** | Kyverno webhook unreachable (pod crash, service/DNS issue). | 1. Check pods/services: `kubectl get pods,svc -n kyverno`<br>2. Restart: `kubectl rollout restart deployment -n kyverno`<br>3. Test: `kubectl exec -n argocd <pod> -- curl -vk https://kyverno-svc.kyverno.svc:443`<br>4. Reapply Kyverno: `kubectl apply -f https://raw.githubusercontent.com/kyverno/kyverno/main/config/release/install.yaml` |
+| **CrashLoopBackOff in kyverno-cleanup-controller or kyverno-reports-controller** | Leader election failure (context deadline). | 1. Check logs: `kubectl logs -n kyverno <pod>`<br>2. Verify leases: `kubectl get lease -n kyverno`<br>3. Test API server: `curl -k https://kubernetes.default.svc:443/healthz`<br>4. Scale Minikube: `minikube stop; minikube delete; minikube start --cpus=4 --memory=8192` |
+| **Pod Pending: Insufficient CPU** | Node resource exhaustion (100% CPU allocated). | 1. Check usage: `kubectl top nodes`, `kubectl top pods -A`<br>2. Delete low-priority pods: `kubectl delete pod compliant-pod -n dev`<br>3. Scale Minikube: `minikube stop; minikube delete; minikube start --cpus=4 --memory=8192` |
+| **Invalid value: 0: must be specified for update** | Missing resource version for policy update. | 1. Delete/reapply: `kubectl delete clusterpolicy <name> && kubectl apply -f <policy.yaml>`<br>2. Force apply: `kubectl apply -f <policy.yaml> --force` |
+| **Kyverno blocks monitoring/argocd pods** | Missing namespace exclusions. | Add exclude section in policies:<br>```yaml<br>namespaces:<br>  - monitoring<br>  - argocd<br>``` |
+| **Minikube resource errors** | EC2 resource limits exceeded. | Reduce resources: `--memory=2048m` or scale to higher specs: `--cpus=4 --memory=8192` |
 
 
+### Project Cleanup 
 
+- **Stop and delete the Minikube cluster**
+```bash
+minikube stop
+minikube delete
+rm -rf ~/.minikube
+```
+- **Remove local project files**
+```bash
+cd ~
+rm -rf Enforce-kubernetes-security-with-kyverno
+```
+- **Remove Argo CD CLI**
+```bash
+sudo rm /usr/local/bin/argocd
+```
 
+## 🏆 Achievements
 
+- **Implemented Policy-as-Code**: Enforced Kubernetes security best practices using Kyverno, blocking non-compliant resources (e.g., containers using **latest tags or missing resource limits**).
 
+- **Integrated GitOps Workflow**: Automated policy deployment and version control through Argo CD, ensuring consistent, declarative governance across **dev, staging, and prod** environments.
 
+- **Built Cloud-Native Monitoring Stack**: Deployed **Prometheus and Grafana** for real-time monitoring of Kyverno, Argo CD, and cluster performance metrics with resource-efficient configurations.
 
+- **Validated Policy Compliance**: Tested multiple scenarios with **compliant and non-compliant pods** to confirm **policy enforcement** and visualized results in the **Argo CD dashboard**.
 
+- **Automated Multi-Environment Management**: Applied environment-specific Kyverno rules (e.g., **stricter limits for production, flexible rules for development/staging**).
+
+- **Enhanced Security Observability**: Exposed Kyverno metrics via ServiceMonitor, visualized cluster and policy health in Grafana dashboards, and performed port-forwarding for browser-based access.
+
+- **Troubleshooting & Optimization**: Diagnosed webhook, namespace, and service issues to stabilize Kyverno and Argo CD on resource-constrained EC2 Minikube setup.
+
+- **End-to-End Cloud-Native Workflow**: Achieved complete implementation of **Kubernetes Security + GitOps + Monitoring workflow on AWS EC2**, demonstrating real-world DevSecOps capabilities.
+
+## 🙏 Acknowledgements
+
+- This project was **inspired** by **Abhishek Veeramalla**, whose tutorials and guidance on Kubernetes security, Kyverno, and GitOps provided the foundation for this implementation.
+
+- **Adapted and extended** to create a complete end-to-end **Cloud-Native Kubernetes Security and Monitoring** workflow with **multi-environment support and Prometheus/Grafana monitoring on AWS EC2**.
 
 
 
