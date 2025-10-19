@@ -20,54 +20,45 @@
 - Integrate Prometheus/Grafana for monitoring Kyverno metrics.
 
 Repo Structure:
+
 ```bash
 Cloud-Native-Kubernetes-Security-and-Monitoring/
-├── Docker Compose/
-│   ├── docker-compose.yaml
-│   └── prometheus.yaml
-├── Existing/
-│   ├── Project/
-│   │   ├── Block-latest-tag.sh
-│   │   ├── Block-latest-tag.yaml
-│   │   ├── Create an Argo CD Application for Kyverno Policies
-│   │   │   ├── argo-kyverno-app.yaml
-│   │   │   └── argo.sh
-│   │   ├── Generate → Auto-create a Default Network Policy.yaml
-│   │   ├── Invalid-pods/
-│   │   │   ├── Block-Latest-tag.yaml
-│   │   │   ├── First Policy-SecondPolicy.yaml
-│   │   │   ├── Invalid-Values-For-Resources.yaml
-│   │   │   ├── Missing-Only-Limits.yaml
-│   │   │   ├── Missing-Requests-Limits.yaml
-│   │   │   ├── Violating Policies.yaml
-│   │   │   └── verify-container-images.yaml
-│   │   ├── Mutate → Auto-Inject Pod Security Context.yaml
-│   │   ├── Validate → Block Usage of latest Tag in Deployments.yaml
-│   │   ├── Verify Images → Ensure Container Images are Signed.yaml
-│   │   ├── enforce-network-policy.yaml
-│   │   ├── enforce-pod-requests-limits.yml
-│   │   └── valid-pods/
-│   │       ├── Corrected-invalid-pod.yaml
-│   │       ├── secure-nginx-deployment.yaml
-│   │       ├── test-deployment-4-policies.yaml
-│   │       └── valid-pod-with-resources.yaml
-│   └── kyverno-Implement-steps
-│       └── README.markdown
-├── Policies/
+|
+|-- Kyverno-Overview/
+|
+├── policies/
 │   ├── disallow-latest-tag.yaml
-│   ├── multi-environment.yaml
-│   └── require-requests-limits.yaml
-├── README.markdown
-├── kyverno-Implement-steps
-│   └── README.md
+│   ├── require-requests-limits.yaml
+│   ├── enforce-network-policy.yaml
+│   ├── generate-default-network-policy.yaml
+│   ├── auto-add-pod-security.yaml
+│   ├── verify-container-images.yaml
+│   ├── block-privilege-escalation.yaml
 ├── monitoring/
 │   ├── kyverno-servicemonitor.yaml
-│   └── prometheus-values.yaml
-└── tests/
-    ├── compliant-pod.yaml
-    └── non-compliant-pod.yaml
-
-12 directories, 33 files
+│   ├── kyverno-nodeport.yaml
+│   ├── prometheus-values.yaml
+├── tests/
+│   ├── valid/
+│   │   ├── compliant-pod.yaml
+│   │   ├── compliant-deployment.yaml
+│   ├── invalid/
+│   │   ├── non-compliant-pod.yaml
+│   │   ├── invalid-pod-latest.yaml
+│   │   ├── invalid-pod.yaml
+│   │   ├── invalid-pod-invalid-values.yaml
+│   │   ├── invalid-pod-missing-limits.yaml
+│   │   ├── invalid-pod-missing-resources.yaml
+│   │   ├── untrusted-image-pod.yaml
+├── scripts/
+│   ├── setup.sh
+│   ├── install-kyverno.sh
+│   ├── test-policies.sh
+├── docs/
+│   ├── images/
+├── README.md
+├── LICENSE
+├── .gitignore
 
 ```
 
@@ -329,11 +320,7 @@ kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
 <img width="1548" height="163" alt="image" src="https://github.com/user-attachments/assets/81ac3bad-1ed1-4ee1-b40b-82881a5b308d" />
 
 
-
-- **Note**:
-- ### Dashboard of Grafana under "Connection"
-  - In the Prometheus server URL field, we must add http:// before the IP address..
-    - Ex: http://10.108.199.33:9090
+- **Note**: When configuring the Prometheus data source in Grafana, ensure the URL includes `http://` (e.g., `http://<prometheus-service-ip>:9090`).
 
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1a51474a-7d8c-4945-b407-096334851acd" />
@@ -450,7 +437,9 @@ spec:
             - monitoring
             - argocd
 ```
-- #### vim multi-environment.yaml
+
+- #### vim policies/require-requests-limits.yaml
+
 ```bash
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -463,85 +452,6 @@ metadata:
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
       Containers without resource requests and limits can burst and starve other pods.
-spec:
-  validationFailureAction: Enforce  # Blocks non-compliant resources
-  background: true
-  rules:
-
-  # Rule 1: General rule for all namespaces (base rule)
-  - name: check-for-requests-and-limits
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    validate:
-      message: "Policy Violation: container resources requests and limits are required!"
-      pattern:
-        spec:
-          containers:
-          - resources:
-              requests:
-                memory: "?*"
-                cpu: "?*"
-              limits:
-                memory: "?*"
-                cpu: "?*"
-
-  # Rule 2: Stricter requirements for prod namespace
-  - name: check-for-prod-stricter-limits
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-          namespaces:
-          - prod
-    validate:
-      message: "Production requires stricter limits."
-      pattern:
-        spec:
-          containers:
-          - resources:
-              requests:
-                memory: ">=64Mi"
-                cpu: ">=250m"
-              limits:
-                memory: ">=128Mi"
-                cpu: ">=500m"
-
-  # Rule 3: Basic limits for dev and staging namespaces
-  - name: dev-staging-limits
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-          namespaces:
-          - dev
-          - staging
-    validate:
-      message: "Dev/Staging require basic limits."
-      pattern:
-        spec:
-          containers:
-          - resources:
-              requests:
-                memory: "?*"
-                cpu: "?*"
-              limits:
-                memory: "?*"
-                cpu: "?*"
-```
-
-
-- #### vim policies/require-requests-limits.yaml
-
-```bash
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
-metadata:
-  name: require-requests-limits
 spec:
   validationFailureAction: Enforce
   background: true
@@ -564,12 +474,12 @@ spec:
             containers:
               - resources:
                   requests:
-                    cpu: "?*"
                     memory: "?*"
+                    cpu: "?*"
                   limits:
-                    cpu: "?*"
                     memory: "?*"
-    - name: prod-minimum-limits
+                    cpu: "?*"
+    - name: prod-strict-limits
       match:
         any:
           - resources:
@@ -583,17 +493,17 @@ spec:
             - monitoring
             - argocd
       validate:
-        message: "Production Pods must have at least 250m CPU, 64Mi memory requests, and 500m CPU, 128Mi memory limits."
-        anyPattern:
-          - spec:
-              containers:
-                - resources:
-                    requests:
-                      cpu: "250m"
-                      memory: "64Mi"
-                    limits:
-                      cpu: "500m"
-                      memory: "128Mi"
+        message: "Production requires stricter limits."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  requests:
+                    memory: ">=64Mi"
+                    cpu: ">=250m"
+                  limits:
+                    memory: ">=128Mi"
+                    cpu: ">=500m"
     - name: dev-staging-limits
       match:
         any:
@@ -609,17 +519,17 @@ spec:
             - monitoring
             - argocd
       validate:
-        message: "Dev/Staging Pods must have resource requests and limits."
+        message: "Dev/Staging require basic limits."
         pattern:
           spec:
             containers:
               - resources:
                   requests:
-                    cpu: "?*"
                     memory: "?*"
+                    cpu: "?*"
                   limits:
-                    cpu: "?*"
                     memory: "?*"
+                    cpu: "?*"
 ```
 **Verify**:
 

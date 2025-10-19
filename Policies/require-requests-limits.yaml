@@ -2,6 +2,13 @@ apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: require-requests-limits
+  annotations:
+    policies.kyverno.io/title: Require Requests and Limits
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Containers without resource requests and limits can burst and starve other pods.
 spec:
   validationFailureAction: Enforce
   background: true
@@ -12,6 +19,11 @@ spec:
           - resources:
               kinds:
                 - Pod
+      exclude:
+        resources:
+          namespaces:
+            - monitoring
+            - argocd
       validate:
         message: "Policy Violation: container resources requests and limits are required!"
         pattern:
@@ -24,7 +36,6 @@ spec:
                   limits:
                     memory: "?*"
                     cpu: "?*"
-
     - name: prod-strict-limits
       match:
         any:
@@ -33,6 +44,11 @@ spec:
                 - Pod
               namespaces:
                 - prod
+      exclude:
+        resources:
+          namespaces:
+            - monitoring
+            - argocd
       validate:
         message: "Production requires stricter limits."
         pattern:
@@ -45,8 +61,29 @@ spec:
                   limits:
                     memory: ">=128Mi"
                     cpu: ">=500m"
+    - name: dev-staging-limits
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - dev
+                - staging
       exclude:
         resources:
           namespaces:
             - monitoring
             - argocd
+      validate:
+        message: "Dev/Staging require basic limits."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  requests:
+                    memory: "?*"
+                    cpu: "?*"
+                  limits:
+                    memory: "?*"
+                    cpu: "?*"
