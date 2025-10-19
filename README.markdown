@@ -62,7 +62,7 @@ minikube start --driver=docker --memory=3072m --cpus=2
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 # Initialize repository
-git clone https://github.com/venkateswarluyendoti/Enforce-kubernetes-security-with-kyverno.git
+git clone https://github.com/venkateswarluyendoti/Cloud-Native-Kubernetes-Security-and-Monitoring.git
 cd Enforce-kubernetes-security-with-kyverno
 ```
 
