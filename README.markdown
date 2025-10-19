@@ -119,6 +119,9 @@ chmod +x install-kyverno.sh
 - kubectl get pods -n kyverno (Running).
 - kubectl logs -n kyverno deployment/kyverno-admission-controller (no errors).
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/2764104e-8e04-4f15-8f42-be09ff13f57a" />
+
+
 <img width="1919" height="458" alt="Screenshot 2025-10-18 113855" src="https://github.com/user-attachments/assets/ae357735-f538-4700-b9f1-69f3685052b3" />
 
 ## Phase 3: Install Prometheus and Grafana
