@@ -125,7 +125,7 @@ chmod +x install-kyverno.sh
 <img width="1910" height="372" alt="image" src="https://github.com/user-attachments/assets/7869b266-5530-447c-89cc-4358df09c07e" />
 
 
-<img width="1919" height="458" alt="Screenshot 2025-10-18 113855" src="https://github.com/user-attachments/assets/ae357735-f538-4700-b9f1-69f3685052b3" />
+
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0bd6e201-a1fd-436f-b6ec-ad4c7840b3d5" />
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/bfbec7f0-12bb-40b3-9da8-22abcd8d6c57" />
