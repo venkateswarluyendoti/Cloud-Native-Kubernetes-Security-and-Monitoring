@@ -815,9 +815,29 @@ rm -rf Enforce-kubernetes-security-with-kyverno
 sudo rm /usr/local/bin/argocd
 ```
 
+## 🏆 Achievements
 
+- **Implemented Policy-as-Code**: Enforced Kubernetes security best practices using Kyverno, blocking non-compliant resources (e.g., containers using **latest tags or missing resource limits**).
 
+- **Integrated GitOps Workflow**: Automated policy deployment and version control through Argo CD, ensuring consistent, declarative governance across **dev, staging, and prod** environments.
 
+- **Built Cloud-Native Monitoring Stack**: Deployed **Prometheus and Grafana** for real-time monitoring of Kyverno, Argo CD, and cluster performance metrics with resource-efficient configurations.
+
+- **Validated Policy Compliance**: Tested multiple scenarios with **compliant and non-compliant pods** to confirm **policy enforcement** and visualized results in the **Argo CD dashboard**.
+
+- **Automated Multi-Environment Management**: Applied environment-specific Kyverno rules (e.g., **stricter limits for production, flexible rules for development/staging**).
+
+- **Enhanced Security Observability**: Exposed Kyverno metrics via ServiceMonitor, visualized cluster and policy health in Grafana dashboards, and performed port-forwarding for browser-based access.
+
+- **Troubleshooting & Optimization**: Diagnosed webhook, namespace, and service issues to stabilize Kyverno and Argo CD on resource-constrained EC2 Minikube setup.
+
+- **End-to-End Cloud-Native Workflow**: Achieved complete implementation of **Kubernetes Security + GitOps + Monitoring workflow on AWS EC2**, demonstrating real-world DevSecOps capabilities.
+
+## 🙏 Acknowledgements
+
+- This project was **inspired** by **Abhishek Veeramalla**, whose tutorials and guidance on Kubernetes security, Kyverno, and GitOps provided the foundation for this implementation.
+
+- **Adapted and extended** to create a complete end-to-end **Cloud-Native Kubernetes Security and Monitoring** workflow with **multi-environment support and Prometheus/Grafana monitoring on AWS EC2**.
 
 
 
