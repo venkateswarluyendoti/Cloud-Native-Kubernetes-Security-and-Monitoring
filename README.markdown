@@ -15,7 +15,7 @@
 
 Repo Structure:
 ```bash
-Enforce-kubernetes-security-with-kyverno/
+Cloud-Native-Kubernetes-Security-and-Monitoring/
 ├── policies/
 │   ├── disallow-latest-tag.yaml
 │   └── require-requests-limits.yaml
