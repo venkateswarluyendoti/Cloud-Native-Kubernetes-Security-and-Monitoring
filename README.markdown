@@ -56,7 +56,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 # Install Minikube
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
-minikube start --driver=docker --memory=3072m --cpus=2
+minikube start --driver=docker --memory=4096m --cpus=2
 
 # Install Helm
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -77,7 +77,7 @@ chmod +x setup.sh
 ./setup.sh
 ```
 <img width="1920" height="1080" alt="Screenshot (290)" src="https://github.com/user-attachments/assets/af38fe91-da96-4928-8995-ee2618a4f5cb" />
-<img width="1920" height="1080" alt="Screenshot (291)" src="https://github.com/user-attachments/assets/558ea27e-d9e8-4518-b676-10b82f9c2462" />
+<img width="1916" height="495" alt="image" src="https://github.com/user-attachments/assets/75de85ca-1d7f-4102-bddb-e899236c5cd7" />
 
 **Verify**:
 
@@ -88,6 +88,7 @@ chmod +x setup.sh
 - helm version (e.g., v3.14.x).
 - ls -l (confirm directories: policies, tests, monitoring).
 
+<img width="1915" height="815" alt="image" src="https://github.com/user-attachments/assets/e0c1023e-8051-416b-80a9-9a1181fedc36" />
 
 ## Phase 2: Install Kyverno (Without Policies)
 
