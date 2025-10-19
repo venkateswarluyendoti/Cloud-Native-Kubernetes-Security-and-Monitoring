@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: enforce-network-policy
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-network-policy
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Pods must be in a namespace with a NetworkPolicy."
+        foreach:
+          - list: "request.object.metadata.namespace"
+            deny:
+              conditions:
+                all:
+                  - key: "{{ request.object.metadata.namespace }}"
+                    operator: NotIn
+                    value: ["kube-system", "monitoring", "argocd"]
+                  - key: "{{ length(kubernetes.networkpolicies[request.object.metadata.namespace][*]) }}"
+                    operator: Equals
+                    value: 0

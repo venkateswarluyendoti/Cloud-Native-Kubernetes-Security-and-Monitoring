@@ -1,0 +1,24 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-container-images
+spec:
+  validationFailureAction: enforce
+  rules:
+    - name: validate-image
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Container image must be pulled from a trusted registry (e.g., docker.io)."
+        pattern:
+          spec:
+            containers:
+              - image: "docker.io/*"
+      exclude:
+        resources:
+          namespaces:
+            - monitoring
+            - argocd

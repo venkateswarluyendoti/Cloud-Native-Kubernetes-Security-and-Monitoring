@@ -1,0 +1,26 @@
+cat <<EOF > policies/block-privilege-escalation.yaml
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: block-privilege-escalation
+spec:
+  validationFailureAction: enforce
+  rules:
+    - name: block-privilege-escalation
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "Privilege escalation is not allowed."
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  allowPrivilegeEscalation: false
+      exclude:
+        resources:
+          namespaces:
+            - monitoring
+            - argocd
+EOF

@@ -1,0 +1,10 @@
+cat <<EOF > tests/invalid/invalid-pod-latest.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: invalid-pod-latest
+spec:
+  containers:
+    - name: nginx
+      image: nginx:latest
+EOF
