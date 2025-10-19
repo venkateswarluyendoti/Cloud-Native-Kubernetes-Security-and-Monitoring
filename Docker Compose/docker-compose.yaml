@@ -1,24 +1,57 @@
-version: '3'
-
+version: '3.8'
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.45.0
+    container_name: prometheus
     volumes:
+      - prometheus_data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-
-  node-exporter:
-    image: prom/node-exporter
-    ports:
-      - "9100:9100"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "256M"
+        reservations:
+          cpus: "0.25"
+          memory: "128M"
+    restart: unless-stopped
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:9.5.2
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
     ports:
       - "3000:3000"
-    volumes:
-      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "128M"
+        reservations:
+          cpus: "0.1"
+          memory: "64M"
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.21
+    container_name: nginx
+    ports:
+      - "8080:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "64M"
+        reservations:
+          cpus: "0.1"
+          memory: "32M"
+    restart: unless-stopped
 
 volumes:
-  grafana-storage:
+  prometheus_data:
+  grafana_data:
