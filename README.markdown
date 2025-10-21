@@ -2,15 +2,7 @@
 **Overview**
 - This project demonstrates Kubernetes security governance using Kyverno for policy enforcement, managed via Argo CD for GitOps. It includes multi-environment support (dev, prod, staging), Prometheus/Grafana monitoring, policy testing, and comprehensive troubleshooting. The setup runs on a single-node Minikube cluster within AWS EC2 resource constraints (2 vCPUs, ~3.8GB memory).
 
-<img width="1917" height="723" alt="image" src="https://github.com/user-attachments/assets/14d4a722-5978-47d8-a785-6efea3d62a87" />
-
-<img width="1915" height="689" alt="Screenshot 2025-10-19 092455" src="https://github.com/user-attachments/assets/a1da5994-1936-4207-97dc-eaa6564c8ada" />
-<img width="1919" height="722" alt="Screenshot 2025-10-19 092527" src="https://github.com/user-attachments/assets/9cc018df-c1f9-4cd9-b781-395e72543eac" />
-
 <img width="1913" height="732" alt="image" src="https://github.com/user-attachments/assets/b2d5c15d-206b-478d-b896-83fae07d6709" />
-
-<img width="1916" height="705" alt="Screenshot 2025-10-18 121336" src="https://github.com/user-attachments/assets/7507210c-a947-4bef-acdc-beff29a1303a" />
-
 
 **Goals**:
 
@@ -23,9 +15,6 @@ Repo Structure:
 
 ```bash
 Cloud-Native-Kubernetes-Security-and-Monitoring/
-|
-|-- Kyverno-Overview/
-|
 ├── policies/
 │   ├── disallow-latest-tag.yaml
 │   ├── require-requests-limits.yaml
@@ -50,15 +39,10 @@ Cloud-Native-Kubernetes-Security-and-Monitoring/
 │   │   ├── invalid-pod-missing-limits.yaml
 │   │   ├── invalid-pod-missing-resources.yaml
 │   │   ├── untrusted-image-pod.yaml
-├── scripts/
-│   ├── setup.sh
-│   ├── install-kyverno.sh
-│   ├── test-policies.sh
 ├── docs/
 │   ├── images/
 ├── README.md
 ├── LICENSE
-├── .gitignore
 
 ```
 
@@ -107,8 +91,6 @@ cd Cloud-Native-Kubernetes-Security-and-Monitoring
 chmod +x setup.sh
 ./setup.sh
 ```
-<img width="1920" height="1080" alt="Screenshot (290)" src="https://github.com/user-attachments/assets/af38fe91-da96-4928-8995-ee2618a4f5cb" />
-<img width="1916" height="495" alt="image" src="https://github.com/user-attachments/assets/75de85ca-1d7f-4102-bddb-e899236c5cd7" />
 
 **Verify**:
 
@@ -119,7 +101,6 @@ chmod +x setup.sh
 - helm version (e.g., v3.14.x).
 - ls -l (confirm directories: policies, tests, monitoring).
 
-<img width="1915" height="815" alt="image" src="https://github.com/user-attachments/assets/e0c1023e-8051-416b-80a9-9a1181fedc36" />
 
 ## Phase 2: Install Kyverno (Without Policies)
 
@@ -152,16 +133,6 @@ chmod +x install-kyverno.sh
 - kubectl logs -n kyverno deployment/kyverno-admission-controller (no errors).
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/2764104e-8e04-4f15-8f42-be09ff13f57a" />
-
-<img width="1910" height="372" alt="image" src="https://github.com/user-attachments/assets/7869b266-5530-447c-89cc-4358df09c07e" />
-
-
-
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0bd6e201-a1fd-436f-b6ec-ad4c7840b3d5" />
-
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/bfbec7f0-12bb-40b3-9da8-22abcd8d6c57" />
-
-
 
 
 ## Phase 3: Install Prometheus and Grafana
@@ -301,10 +272,6 @@ kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-pa
 ```
 <img width="1919" height="277" alt="image" src="https://github.com/user-attachments/assets/f5ef13fe-fa22-432d-b193-38cbeb177a4a" />
 
-<img width="1919" height="897" alt="image" src="https://github.com/user-attachments/assets/67f75178-2be1-425d-b488-d4b64bccd4a1" />
-
-
-<img width="1919" height="793" alt="image" src="https://github.com/user-attachments/assets/0319ea46-d8d4-4a6f-b3b5-e5ce895c683a" />
 
 ```bash
 kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
@@ -328,16 +295,6 @@ kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/fc2c8edc-3dab-4003-8679-822cdbc1f464" />
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/383ecf23-c244-4672-9b2b-2583b2fd523d" />
-
-<img width="1920" height="1080" alt="Screenshot (309)" src="https://github.com/user-attachments/assets/29269ed4-3458-458c-9868-fedec367d9a1" />
-
-<img width="1920" height="1080" alt="Screenshot (310)" src="https://github.com/user-attachments/assets/4258f3fb-2a03-46a4-af4c-6b086dd69c69" />
-
-<img width="1920" height="1080" alt="Screenshot (312)" src="https://github.com/user-attachments/assets/8c15ce39-622d-4894-a7fa-3e1f97ca496c" />
-
-<img width="1919" height="786" alt="image" src="https://github.com/user-attachments/assets/0c4d0773-e96f-405b-ae31-29e03e4283d1" />
-
-<img width="1920" height="1080" alt="Screenshot (313)" src="https://github.com/user-attachments/assets/24054d83-a48f-4a2c-a8e4-7b29890ad8ac" />
 
 
 ## Phase 4: Install and Configure Argo CD
@@ -617,10 +574,6 @@ kubectl create namespace prod
 kubectl create namespace staging
 ```
 - **Verify**: kubectl get namespaces (dev, prod, staging listed).
-<img width="1546" height="160" alt="image" src="https://github.com/user-attachments/assets/dcae253a-8bec-498f-a1d5-fa07d34b5fd1" />
-
-<img width="1559" height="309" alt="image" src="https://github.com/user-attachments/assets/1fa35605-9264-4efa-962b-6d3e86801ae9" />
-
 
 2. **Update Policy for Multi-Environment**
 
@@ -663,8 +616,6 @@ kubectl apply -f monitoring/kyverno-servicemonitor.yaml
 
 - **Verify**: **kubectl get servicemonitor -n monitoring** (kyverno-metrics listed).
 
-<img width="1557" height="424" alt="image" src="https://github.com/user-attachments/assets/008755c0-edf0-4543-bbc1-e64579c810ca" />
-
 
 3. **Configure Grafana Dashboard**
 ```bash
@@ -675,10 +626,6 @@ kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n mo
 - Log in (admin password): kubectl get secret -n monitoring prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
 - Add Prometheus data source: 
     - **ex**: http://10.108.46.119:9090
-
-<img width="1920" height="1080" alt="Screenshot (305)" src="https://github.com/user-attachments/assets/83d2219f-ff30-4e09-bd57-d15506665660" />
-
-<img width="1920" height="1080" alt="Screenshot (308)" src="https://github.com/user-attachments/assets/e9762865-1b9a-4c8e-8754-d3de6bfeacfa" />
 
 - Create dashboard with query: rate(kyverno_policy_violations_total[5m]).
   
