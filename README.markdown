@@ -265,8 +265,6 @@ To access Grafana externally (without port-forwarding), open the NodePort in you
    - Description: "Grafana NodePort access".
 4. Save rules.
 
-- Port-forward (local testing): kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
-
 - ### 🌐 Access Grafana from Browser
 - Use your EC2 public IP or DNS:
 
@@ -704,7 +702,7 @@ rm -rf ~/.minikube
 - **Remove local project files**
 ```bash
 cd ~
-rm -rf Enforce-kubernetes-security-with-kyverno
+rm -rf Cloud-Native-Kubernetes-Security-and-Monitoring
 ```
 - **Remove Argo CD CLI**
 ```bash
