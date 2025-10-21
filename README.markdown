@@ -247,18 +247,35 @@ NAME                 TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          A
 prometheus-grafana   NodePort   10.105.141.176  <none>        80:3xxxx/TCP     5m
 ```
 
-- Port-forward: kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
+- Note the NodePort (e.g., 31509).
+
+### Add AWS EC2 Inbound Rules for Grafana
+
+To access Grafana externally (without port-forwarding), open the NodePort in your EC2 instance's security group:
+
+1. Go to AWS Console > EC2 > Instances > Select your instance > Security tab > Click the Security Group ID.
+2. In Security Groups > Edit inbound rules.
+3. Add a rule:
+   - Type: Custom TCP
+   - Port range: <Your NodePort, e.g., 31509>
+   - Source: 0.0.0.0/0 (for public access) or your IP (e.g., My IP for security).
+   - Description: "Grafana NodePort access".
+4. Save rules.
+
+- Port-forward (local testing): kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
 
 - ### 🌐 Access Grafana from Browser
-
 - Use your EC2 public IP or DNS:
+
+- Port-forward: kubectl port-forward --address 0.0.0.0 service/prometheus-grafana 31509:80 -n monitoring
+
 ```bash
 http://<ec2-public-ip>:<nodeport>
 ```
 
 - Example:
 ```bash
-http://3.90.246.106:30977
+http://3.90.246.106:31509
 ```
 
 - Access Grafana: http://localhost:31509 
@@ -335,6 +352,22 @@ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 <img width="1916" height="189" alt="image" src="https://github.com/user-attachments/assets/d69c1ff5-5057-49e0-8d61-80edf17dd87f" />
 
 
+ image
+
+- Verify: Note the NodePort (e.g., 31545) with `kubectl get svc argocd-server -n argocd`.
+
+### Add AWS EC2 Inbound Rules for Argo CD
+
+- To access Argo CD externally (without port-forwarding), open the NodePort in your EC2 instance's security group:
+
+1. Go to AWS Console > EC2 > Instances > Select your instance > Security tab > Click the Security Group ID.
+2. In Security Groups > Edit inbound rules.
+3. Add a rule:
+   - Type: Custom TCP
+   - Port range: <Your NodePort, e.g., 31545>
+   - Source: 0.0.0.0/0 (for public access) or your IP (e.g., My IP for security).
+   - Description: "Argo CD NodePort access".
+4. Save rules.
 
 - **Verify**: Access http://<EC2-IP>:<NodePort> (e.g., 32679).
 
