@@ -31,6 +31,9 @@ Cloud-Native-Kubernetes-Security-and-Monitoring/
 │   ├── valid/
 │   │   ├── compliant-pod.yaml
 │   │   ├── compliant-deployment.yaml
+|   |   |-- compliant-app-network-policy.yaml
+|   |   |-- Corrected-invalid-pod.yaml
+|   |   |-- secure-nginx-deployment.yaml
 │   ├── invalid/
 │   │   ├── non-compliant-pod.yaml
 │   │   ├── invalid-pod-latest.yaml
