@@ -699,7 +699,7 @@ rm -rf ~/.minikube
 - **Remove local project files**
 ```bash
 cd ~
-rm -rf Enforce-kubernetes-security-with-kyverno
+rm -rf Cloud-Native-Kubernetes-Security-and-Monitoring
 ```
 - **Remove Argo CD CLI**
 ```bash
