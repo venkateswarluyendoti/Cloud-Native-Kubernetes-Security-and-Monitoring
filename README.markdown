@@ -27,6 +27,9 @@ Cloud-Native-Kubernetes-Security-and-Monitoring/
 │   ├── kyverno-servicemonitor.yaml
 │   ├── kyverno-nodeport.yaml
 │   ├── prometheus-values.yaml
+|-- scripts
+|   |-- setup.sh
+|   |-- install-kyverno.sh
 ├── tests/
 │   ├── valid/
 │   │   ├── compliant-pod.yaml
